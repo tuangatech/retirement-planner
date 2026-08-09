@@ -23,14 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# Claude Code: skills are shared, but local config and run artifacts are not.
-# settings.json holds machine-specific absolute paths and personal tool approvals.
-.claude/settings.json
-.claude/settings.local.json
-.claude/skills/*/out/
-# Maintainer-only: documents pushing straight to main + this machine's dual gh accounts,
-# which contradicts the branch-and-PR flow in CONTRIBUTING.md. Delete this line to share it.
-.claude/skills/push/
+# Claude Code: kept local-only, not synced to GitHub.
+CLAUDE.md
+.claude/
 
 # Downloaded verification bundles (run outputs, not source)
 scripts/retirement-verification-*.json
