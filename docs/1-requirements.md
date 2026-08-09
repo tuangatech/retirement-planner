@@ -36,11 +36,11 @@ Establishes the timeline and tax context that drive duration and phase transitio
 - **Life expectancy** (70–110, default 90) — planning horizon.
 - **State** (50 states + DC) — **thirteen states are modeled**: the nine with no individual income
   tax (AK, FL, NH, NV, SD, TN, TX, WA, WY), **Georgia**, **Virginia**, **California**, and
-  **New York**. For those, state tax is computed and the marginal rate in Step 6 becomes
+  **New York**. For those, state tax is computed and the marginal rate in Step 4 becomes
   **federal-only**. Every other state is guidance only: fold your state's rate into that marginal
   rate yourself — see [`5-state-tax-model.md`](5-state-tax-model.md).
 - **Filing status** — **single** or **married filing jointly**. MFJ reveals spouse age and
-  (in Step 4) spouse Social Security. The couples model is specified in [`4-married-filing-jointly.md`](4-married-filing-jointly.md).
+  (in Step 2) spouse Social Security. The couples model is specified in [`4-married-filing-jointly.md`](4-married-filing-jointly.md).
 
 All dollar inputs are in **retirement-year dollars**. Retirement duration = `lifeExpectancy − retirementAge`.
 
@@ -86,7 +86,7 @@ allowed); multiple accounts of a type are summed into one.
 
 ### 3.3 Withdrawal Strategy & Order
 
-Selected on the dedicated Step 7 (after Tax):
+Selected on Step 4 ("Assumptions & Strategy", after Tax):
 
 - **Standard order** — strict priority order.
 - **Tax-smart sequencing (default)** — each gap year, first draw Tax-Deferred up to the
@@ -288,20 +288,25 @@ Value proposition before the wizard: hero ("The Honest Retirement Calculator"),
 differentiators (transparent limitations; Monte Carlo; no signup/tracking, fully private),
 and a "Start Planning" CTA into Step 1.
 
-### 9.2 Wizard (7 steps)
+### 9.2 Wizard (4 steps)
 
-Progress indicator, Back/Next with validation, auto-save to localStorage.
+Progress indicator, Back/Next with validation, auto-save to localStorage. Four screens, each
+merging two of the original seven conceptual steps (§3–§7 above) so related decisions sit
+together:
 
-1. **Personal Info** — retirement age, life expectancy, state, filing status (+ spouse age if MFJ)
-2. **Retirement Phases** — spending, start ages, one-time expenses
-3. **Investment Accounts** — balances, returns, withdrawal priority
-4. **Income Sources** — Social Security (+ spouse SS if MFJ), pensions, part-time, rental
-5. **Healthcare** — pre-Medicare, Medicare, out-of-pocket by phase
-6. **Taxes & Simulation** — marginal rate, inflation, (runs fixed at 10,000)
-7. **Withdrawal Strategy** — choose strategy + timeline diagram; **Calculate** → results
+1. **Your Plan** — retirement age, life expectancy, state, filing status (+ spouse age if MFJ);
+   phase-based spending, start ages, one-time expenses. *(Merges the former Personal Info and
+   Retirement Phases steps.)*
+2. **Savings & Income** — account balances/returns (Tax-Deferred, Roth, Taxable, HSA); Social
+   Security (+ spouse SS if MFJ), pensions, part-time work, rental income. *(Merges the former
+   Investment Accounts and Income Sources steps.)*
+3. **Healthcare** — pre-Medicare, Medicare, out-of-pocket by phase.
+4. **Assumptions & Strategy** — marginal rate, inflation, (runs fixed at 10,000), withdrawal
+   strategy + timeline diagram; **Calculate** → results. *(Merges the former Taxes & Simulation
+   and Withdrawal Strategy steps.)*
 
 **Basic/Advanced toggle:** Basic hides a handful of technical settings; Advanced exposes std
-dev, healthcare inflation, etc. Defaults suit most users.
+dev, healthcare inflation, cost basis %, etc. Defaults suit most users.
 
 ### 9.3 Results Dashboard
 
@@ -428,7 +433,12 @@ qualified professionals (CFP, CPA, attorney) before making decisions."*
 
 ---
 
-**Document version:** 1.8 · **Last updated:** 2026-07-31 · **Status:** implemented, evolving.
+**Document version:** 1.9 · **Last updated:** 2026-08-09 · **Status:** implemented, evolving.
+
+**Changes from v1.8:** Wizard consolidated from seven conceptual steps to **four screens**
+(§9.2) — Your Plan, Savings & Income, Healthcare, Assumptions & Strategy — each merging two of
+the original steps; step-number cross-references elsewhere in this doc (§2.1, §3.3) updated to
+match.
 
 **Changes from v1.7:** New York shipped — a source-dependent retirement benefit (government
 pensions fully exempt; private pension/annuity/IRA income excluded up to $20,000 per person,
