@@ -1,7 +1,7 @@
 // src/App.tsx - Main Application Component
 
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { InputsProvider } from '@/contexts/InputsContext';
 import { ResultsProvider } from '@/contexts/ResultsContext';
 import LandingPage from '@/pages/LandingPage';
@@ -26,6 +26,19 @@ function useBlurNumberInputOnWheel() {
     }, []);
 }
 
+// Client-side navigation (<Link>, navigate()) doesn't reset scroll position the way a full
+// page load does, so a new route can render wherever the previous page was scrolled to.
+// WizardPage already smooth-scrolls itself between steps, so it's excluded here.
+function ScrollToTop() {
+    const { pathname } = useLocation();
+    useEffect(() => {
+        if (!pathname.startsWith('/wizard')) {
+            window.scrollTo(0, 0);
+        }
+    }, [pathname]);
+    return null;
+}
+
 function App() {
     useBlurNumberInputOnWheel();
 
@@ -33,6 +46,7 @@ function App() {
         <BrowserRouter>
             <InputsProvider>
                 <ResultsProvider>
+                    <ScrollToTop />
                     <Routes>
                         {/* Landing page at root */}
                         <Route path="/" element={<LandingPage />} />

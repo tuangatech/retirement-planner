@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { CheckCircle, XCircle, TrendingUp, AlertCircle, ArrowRight, Lock } from 'lucide-react';
+import { CheckCircle, XCircle, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Footer } from '../components/common/Footer';
 
 function Logo({ size = 'md', variant = 'full' }: { size?: 'sm' | 'md' | 'lg', variant?: 'full' | 'icon' }) {
@@ -28,12 +29,6 @@ export default function LandingPage() {
                     <div className="flex justify-between items-center h-16">
                         <Logo size="lg" variant="full" />
                         <div className="flex items-center gap-4">
-                            <Link
-                                to="/state-tax-comparison"
-                                className="hidden sm:inline text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-                            >
-                                Compare State Income Taxes
-                            </Link>
                             <button
                                 onClick={handleStart}
                                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
@@ -49,11 +44,11 @@ export default function LandingPage() {
             <section className="max-w-6xl mx-auto px-4 pt-20 pb-16">
                 <div className="text-center max-w-4xl mx-auto">
                     <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-                        Retirement Planning That Shows Its Work
+                        Retirement Simulator That Shows Its Work
                     </h1>
 
                     <p className="text-xl md:text-2xl text-slate-600 mb-4">
-                        A free retirement calculator that's upfront about <span className="font-semibold text-slate-900">what it models</span> and <span className="font-semibold text-blue-600">how it works</span>.
+                        A free retirement simulator that's upfront about <span className="font-semibold text-slate-900">what it models</span> and <span className="font-semibold text-blue-600">how it works</span>.
                     </p>
 
                     <p className="text-lg text-slate-500 mb-10">
@@ -90,89 +85,22 @@ export default function LandingPage() {
                     </button>
 
                     <p className="text-sm text-slate-500 mt-4">
-                        Takes 5 minutes • See results instantly • Save scenarios locally
+                        Takes 2 minutes • See results instantly • Save scenarios locally
                     </p>
                 </div>
             </section>
 
-            {/* What Makes Us Different */}
+            {/* See It In Action */}
             <section className="bg-white py-20">
                 <div className="max-w-6xl mx-auto px-4">
                     <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 mb-4">
-                        What Makes Us Different
+                        See It In Action
                     </h2>
                     <p className="text-lg text-slate-600 text-center mb-12 max-w-3xl mx-auto">
-                        Most calculators hide assumptions and oversimplify. We do the opposite.
+                        Real results from the simulator — success odds, cash flow, and the full year-by-year breakdown.
                     </p>
 
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {/* Card 1 */}
-                        <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-2xl p-8 hover:shadow-xl transition-shadow">
-                            <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
-                                <AlertCircle className="w-8 h-8 text-white" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">
-                                Full Transparency, Every Time
-                            </h3>
-                            <p className="text-slate-600 mb-4">
-                                Every results page includes a <span className="font-semibold">Assumptions & Methodology</span> panel so you always know exactly what the model includes—and where to apply your own judgment.
-                            </p>
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-900">
-                                <p className="font-semibold mb-2">What we document clearly:</p>
-                                <ul className="space-y-1 text-sm">
-                                    <li>• Long-term care (out of scope)</li>
-                                    <li>• Simplified tax approach</li>
-                                    <li>• Fixed life expectancy input</li>
-                                    <li>• ACA subsidies &amp; early-withdrawal penalties (out of scope)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        {/* Card 2 */}
-                        <div className="bg-gradient-to-br from-teal-50 to-white border-2 border-teal-200 rounded-2xl p-8 hover:shadow-xl transition-shadow">
-                            <div className="w-14 h-14 bg-teal-600 rounded-xl flex items-center justify-center mb-6">
-                                <TrendingUp className="w-8 h-8 text-white" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">
-                                Built for Early Retirement
-                            </h3>
-                            <p className="text-slate-600 mb-4">
-                                Retiring at 45? 52? 58? We're built for early retirement with detailed pre-Medicare healthcare modeling, HSA integration, and Social Security earnings test.
-                            </p>
-                            <div className="bg-teal-50 border border-teal-200 rounded-lg p-3 text-sm text-teal-900">
-                                <p className="font-semibold mb-2">What we include:</p>
-                                <ul className="space-y-1 text-sm">
-                                    <li>• Retirement ages 40-75</li>
-                                    <li>• Pre-Medicare healthcare costs</li>
-                                    <li>• HSA tax-free coverage</li>
-                                    <li>• Part-time work scenarios</li>
-                                    <li>• State income tax for 13 states</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        {/* Card 3 */}
-                        <div className="bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 rounded-2xl p-8 hover:shadow-xl transition-shadow">
-                            <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center mb-6">
-                                <Lock className="w-8 h-8 text-white" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">
-                                Privacy-First Design
-                            </h3>
-                            <p className="text-slate-600 mb-4">
-                                Your financial data never leaves your browser. No accounts, no tracking, no cloud storage. We can't see your data because we never collect it.
-                            </p>
-                            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-sm text-purple-900">
-                                <p className="font-semibold mb-2">Technical details:</p>
-                                <ul className="space-y-1 text-sm">
-                                    <li>• 100% client-side JavaScript</li>
-                                    <li>• Browser localStorage only</li>
-                                    <li>• No server, no database</li>
-                                    <li>• Open calculation methods</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                    <ScreenshotCarousel />
                 </div>
             </section>
 
@@ -241,7 +169,13 @@ export default function LandingPage() {
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                     <p className="text-sm text-blue-200 mt-6">
-                        Takes 5 minutes • See results instantly • 100% free forever
+                        Takes 2 minutes • See results instantly • 100% free forever
+                    </p>
+                    <p className="text-sm text-blue-100 mt-4">
+                        Just want to compare state taxes to pick the right state for your retirement?{' '}
+                        <Link to="/state-tax-comparison" className="font-semibold text-white underline hover:no-underline">
+                            Compare state income taxes →
+                        </Link>
                     </p>
                 </div>
             </section>
@@ -251,6 +185,89 @@ export default function LandingPage() {
     );
 }
 
+
+const SCREENSHOTS = [
+    {
+        src: '/screenshots/summary.png',
+        title: 'Summary Dashboard',
+        description: 'Your success probability at a glance, with portfolio outcomes across worst/median/best-case scenarios.',
+    },
+    {
+        src: '/screenshots/cash-flow.png',
+        title: 'Cash Flow',
+        description: 'Every dollar in and out, year by year — income, expenses, taxes, and portfolio balance.',
+    },
+    {
+        src: '/screenshots/annual-breakdown.png',
+        title: 'Annual Breakdown',
+        description: 'The full year-by-year table behind every projection, exportable to CSV or JSON.',
+    },
+];
+
+const AUTOPLAY_MS = 5000;
+
+function ScreenshotCarousel() {
+    const [index, setIndex] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
+    const total = SCREENSHOTS.length;
+    const goTo = (i: number) => setIndex((i + total) % total);
+    const slide = SCREENSHOTS[index];
+
+    // Re-running on every `index` change (manual or auto) means a manual click
+    // naturally restarts the countdown instead of the next tick landing early.
+    useEffect(() => {
+        if (isPaused) return;
+        const timer = setTimeout(() => goTo(index + 1), AUTOPLAY_MS);
+        return () => clearTimeout(timer);
+    }, [index, isPaused]);
+
+    return (
+        <div
+            className="max-w-4xl mx-auto"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onFocus={() => setIsPaused(true)}
+            onBlur={() => setIsPaused(false)}
+        >
+            <div className="relative bg-slate-50 border-2 border-slate-200 rounded-2xl overflow-hidden shadow-lg h-[420px] sm:h-[520px] flex items-center justify-center">
+                <img src={slide.src} alt={slide.title} className="max-w-full max-h-full object-contain" />
+                <button
+                    type="button"
+                    onClick={() => goTo(index - 1)}
+                    aria-label="Previous screenshot"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-700 rounded-full p-2 shadow-md transition-colors"
+                >
+                    <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                    type="button"
+                    onClick={() => goTo(index + 1)}
+                    aria-label="Next screenshot"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-700 rounded-full p-2 shadow-md transition-colors"
+                >
+                    <ChevronRight className="w-5 h-5" />
+                </button>
+            </div>
+
+            <div className="text-center mt-6 min-h-[64px]">
+                <h3 className="text-xl font-bold text-slate-900 mb-1">{slide.title}</h3>
+                <p className="text-slate-600">{slide.description}</p>
+            </div>
+
+            <div className="flex justify-center gap-2 mt-4">
+                {SCREENSHOTS.map((s, i) => (
+                    <button
+                        key={s.src}
+                        type="button"
+                        onClick={() => goTo(i)}
+                        aria-label={`Go to ${s.title}`}
+                        className={`w-2.5 h-2.5 rounded-full transition-colors ${i === index ? 'bg-blue-600' : 'bg-slate-300 hover:bg-slate-400'}`}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+}
 
 function StepCard({ number, title, description }: { number: string, title: string, description: string }) {
     return (
