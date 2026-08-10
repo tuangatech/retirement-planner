@@ -1,6 +1,6 @@
 # Retirement Planning Simulator
 
-**The Honest Retirement Calculator**
+**Retirement Simulator That Shows Its Work**
 
 A privacy-first, Monte Carlo simulation-based retirement planning tool that helps individuals determine if their retirement plan will work. Built with transparency and statistical accuracy in mind, this tool honestly discloses its limitations rather than creating false confidence.
 
@@ -56,7 +56,7 @@ Slow-Go / No-Go) · two active withdrawal strategies — standard priority order
 deduction-floor filling (a third, gap-year Roth conversions, is scaffolded but disabled).
 
 **What it deliberately does *not* model** — pre-retirement accumulation · **state income tax for
-the other 40 states** (fold your rate into the marginal rate yourself) ·
+the other 38 states** (fold your rate into the marginal rate yourself) ·
 ACA subsidies for pre-Medicare coverage · **long-term care** (often the largest single retirement
 risk) · the survivor's penalty for couples · per-spouse accounts (couples' balances are pooled) ·
 variable inflation · dynamic spending guardrails · fat-tail crashes · fees and transaction costs ·
@@ -171,7 +171,7 @@ retirement-planner/
 │   │   └── utils.ts, format.ts
 │   ├── workers/           # monte-carlo.worker.ts (simulation engine)
 │   ├── pages/             # LandingPage, WizardPage, ResultsPage,
-│   │                      # ScenariosPage, ComparisonPage
+│   │                      # ScenariosPage, ComparisonPage, StateTaxComparisonPage
 │   ├── types/index.ts     # All TypeScript interfaces
 │   ├── App.tsx, main.tsx, index.css
 ├── scripts/               # verify_plan.py + downloaded verification bundles
@@ -182,7 +182,7 @@ retirement-planner/
 └── package.json
 ```
 
-**Routes:** `/` (landing) → `/wizard/:step` (4-step wizard) → `/results` (5 tabs: Summary, Monte Carlo, Cash Flow, Annual Breakdown, Disclosures); plus `/scenarios` and `/compare`.
+**Routes:** `/` (landing) → `/wizard/:step` (4-step wizard) → `/results` (5 tabs: Summary, Monte Carlo, Cash Flow, Annual Breakdown, Disclosures); plus `/scenarios`, `/compare`, and `/state-tax-comparison`.
 
 ---
 
