@@ -19,7 +19,7 @@ models the **retirement phase only** (retirement age → life expectancy).
 **Companion docs:** [`2-federal-tax-model.md`](2-federal-tax-model.md) (federal tax model + constants),
 [`3-withdrawal-strategy.md`](3-withdrawal-strategy.md), [`4-married-filing-jointly.md`](4-married-filing-jointly.md) (couples model),
 [`5-state-tax-model.md`](5-state-tax-model.md) (per-state tax model),
-[`6-system-design.md`](6-system-design.md), [`7-technical-implementation.md`](7-technical-implementation.md).
+[`6-system-design.md`](6-system-design.md).
 
 ---
 
@@ -337,7 +337,7 @@ and print (includes assumptions, static charts, no interactive elements).
   convergence; balances never negative within a year.
 - **External verification:** export a run via the Annual Breakdown "JSON" button and run
   `python3 scripts/verify_plan.py` to independently re-derive income, expenses, healthcare,
-  taxes, and the cash-flow identity. See [`7-technical-implementation.md`](7-technical-implementation.md) §4.2.
+  taxes, and the cash-flow identity.
 
 ---
 
@@ -368,8 +368,7 @@ and print (includes assumptions, static charts, no interactive elements).
   no accounts, no data leaves the browser.
 - **Browsers:** modern evergreen (Chrome/Firefox/Safari/Edge); no IE11.
 
-See [`6-system-design.md`](6-system-design.md) and [`7-technical-implementation.md`](7-technical-implementation.md)
-for architecture and file-level detail.
+See [`6-system-design.md`](6-system-design.md) for architecture and file-level detail.
 
 ---
 
