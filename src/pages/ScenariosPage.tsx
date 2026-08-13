@@ -15,7 +15,7 @@ import { useSearchParams } from 'react-router-dom';
 
 export default function ScenariosPage() {
     const navigate = useNavigate();
-    const { inputs, loadFromScenario, currentScenarioId } = useInputs();
+    const { inputs, loadFromScenario, currentScenarioId, setCurrentScenario } = useInputs();
     const { results } = useResults();
 
     const [scenarios, setScenarios] = useState<SavedScenario[]>(() => getAllScenarios());
@@ -124,7 +124,10 @@ export default function ScenariosPage() {
         }
 
         try {
-            saveScenario(scenarioName, inputs, results);
+            const savedScenario = saveScenario(scenarioName, inputs, results);
+            if (savedScenario) {
+                setCurrentScenario(savedScenario.id, savedScenario.name);
+            }
             refreshScenarios();
             setShowSaveDialog(false);
             setScenarioName('');

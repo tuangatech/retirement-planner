@@ -145,24 +145,17 @@ export const ScenarioManager = React.forwardRef<ScenarioManagerHandle, ScenarioM
             return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
         };
 
-        // Handle button click differently based on mode
-        const handleButtonClick = () => {
-            if (currentScenarioId) {
-                // Update mode: Save directly without dialog
-                handleUpdate();
-            } else {
-                // Create mode: Show dialog to enter name
-                setScenarioName(
-                    `Scenario ${new Date().toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                    })}`
-                );
-                setNameError('');
-                setSaveError('');
-                setShowSaveDialog(true);
-            }
+        const handleOpenSaveAsNewDialog = () => {
+            setScenarioName(
+                `Scenario ${new Date().toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                })}`
+            );
+            setNameError('');
+            setSaveError('');
+            setShowSaveDialog(true);
         };
 
         return (
@@ -186,14 +179,31 @@ export const ScenarioManager = React.forwardRef<ScenarioManagerHandle, ScenarioM
                     </div>
                 )}
 
-                {/* Button click behavior changes based on mode */}
-                <button
-                    onClick={handleButtonClick}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                >
-                    <Save className="w-4 h-4" />
-                    {currentScenarioId ? `Update "${currentScenarioName}"` : 'Save Scenario'}
-                </button>
+                {currentScenarioId ? (
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleUpdate}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                            <Save className="w-4 h-4" />
+                            Update "{currentScenarioName}"
+                        </button>
+                        <button
+                            onClick={handleOpenSaveAsNewDialog}
+                            className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                        >
+                            Save as New
+                        </button>
+                    </div>
+                ) : (
+                    <button
+                        onClick={handleOpenSaveAsNewDialog}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                        <Save className="w-4 h-4" />
+                        Save Scenario
+                    </button>
+                )}
 
                 {/* Save Dialog - Only for creating new scenarios */}
                 {showSaveDialog && (
