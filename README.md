@@ -31,9 +31,6 @@ This tool focuses exclusively on the retirement phase—no pre-retirement accumu
 - **💳 Multiple Income Sources** — Social Security (with earnings test), pensions, part-time work, rental
 - **🔒 Privacy-First** — no server, no accounts, no tracking; everything runs in your browser
 - **💾 Scenario Management** — save and compare scenarios in browser `localStorage`
-- **📈 Rich Visualizations** — interactive charts (Recharts)
-- **🧾 Exportable & Verifiable** — CSV export plus a JSON bundle checked by `scripts/verify_plan.py`
-- **⚠️ Honest Limitations** — mandatory disclosure of what the tool does NOT model
 
 ### Target Audience
 
@@ -297,4 +294,4 @@ retirement decisions.
 
 ---
 
-**Made with ❤️ for the FIRE community**
+**Made for the FIRE community**
