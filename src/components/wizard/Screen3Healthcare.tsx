@@ -215,7 +215,6 @@ export function Screen3Healthcare() {
                             />
                             <span className="absolute right-3 top-2 text-gray-500">/mo</span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">2025 base: $200/month</p>
                     </div>
 
                     <div>
@@ -251,7 +250,6 @@ export function Screen3Healthcare() {
                             />
                             <span className="absolute right-3 top-2 text-gray-500">/mo</span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">Prescription drug coverage</p>
                     </div>
 
                     <div>
@@ -289,7 +287,6 @@ export function Screen3Healthcare() {
                             />
                             <span className="absolute right-3 top-2 text-gray-500">/mo</span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">Supplemental coverage</p>
                     </div>
 
                     {mode === 'advanced' && (
@@ -414,7 +411,6 @@ export function Screen3Healthcare() {
                                     min="0"
                                 />
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">Default: ${DEFAULT_VALUES.healthcare.medicare.outOfPocketByPhase.phase1.toLocaleString()}/year (active, healthy)</p>
                         </div>
 
                         <div>
@@ -438,7 +434,6 @@ export function Screen3Healthcare() {
                                     min="0"
                                 />
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">Default: ${DEFAULT_VALUES.healthcare.medicare.outOfPocketByPhase.phase2.toLocaleString()}/year (more care needed)</p>
                         </div>
 
                         <div>
@@ -462,7 +457,6 @@ export function Screen3Healthcare() {
                                     min="0"
                                 />
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">Default: ${DEFAULT_VALUES.healthcare.medicare.outOfPocketByPhase.phase3.toLocaleString()}/year (significant needs)</p>
                         </div>
                     </div>
                 </div>
