@@ -483,29 +483,24 @@ export function Screen3Healthcare() {
             </div>
 
             {/* Warning about Long-Term Care */}
-            <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
-                <div className="flex gap-3">
-                    <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                        <h4 className="font-semibold text-yellow-900 mb-2">
-                            ⚠️ Important: Long-Term Care NOT Modeled
-                        </h4>
-                        <p className="text-sm text-yellow-800 mb-2">
-                            This simulator does <strong>not</strong> include long-term care costs, which can be substantial:
-                        </p>
-                        <ul className="text-sm text-yellow-800 space-y-1 ml-4 list-disc">
-                            <li>Home health aide: $30-50/hour ($50,000-100,000/year for full-time)</li>
-                            <li>Assisted living: $50,000-70,000/year average</li>
-                            <li>Nursing home: $100,000-150,000/year average</li>
-                            <li>Memory care: $70,000-100,000/year</li>
-                        </ul>
-                        <p className="text-sm text-yellow-800 mt-3">
-                            Consider: Long-term care insurance, Medicaid planning, or setting
-                            aside additional funds for potential care needs.
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <CollapsibleHelpPanel
+                title="Important: Long-Term Care NOT Modeled"
+                variant="warning"
+            >
+                <p>
+                    This simulator does <strong>not</strong> include long-term care costs, which can be substantial:
+                </p>
+                <ul className="space-y-1 ml-4 list-disc">
+                    <li>Home health aide: $30-50/hour ($50,000-100,000/year for full-time)</li>
+                    <li>Assisted living: $50,000-70,000/year average</li>
+                    <li>Nursing home: $100,000-150,000/year average</li>
+                    <li>Memory care: $70,000-100,000/year</li>
+                </ul>
+                <p>
+                    Consider: Long-term care insurance, Medicaid planning, or setting
+                    aside additional funds for potential care needs.
+                </p>
+            </CollapsibleHelpPanel>
         </div>
     );
 }
