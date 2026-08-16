@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { InputsProvider } from '@/contexts/InputsContext';
 import { ResultsProvider } from '@/contexts/ResultsContext';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import LandingPage from '@/pages/LandingPage';
 import WizardPage from '@/pages/WizardPage';
 import ResultsPage from '@/pages/ResultsPage';
@@ -43,33 +44,35 @@ function App() {
     useBlurNumberInputOnWheel();
 
     return (
-        <BrowserRouter>
-            <InputsProvider>
-                <ResultsProvider>
-                    <ScrollToTop />
-                    <Routes>
-                        {/* Landing page at root */}
-                        <Route path="/" element={<LandingPage />} />
+        <ErrorBoundary>
+            <BrowserRouter>
+                <InputsProvider>
+                    <ResultsProvider>
+                        <ScrollToTop />
+                        <Routes>
+                            {/* Landing page at root */}
+                            <Route path="/" element={<LandingPage />} />
 
-                        {/* Wizard with step parameter */}
-                        <Route path="/wizard/:step" element={<WizardPage />} />
+                            {/* Wizard with step parameter */}
+                            <Route path="/wizard/:step" element={<WizardPage />} />
 
-                        {/* Redirect /wizard to /wizard/1 */}
-                        <Route path="/wizard" element={<Navigate to="/wizard/1" replace />} />
+                            {/* Redirect /wizard to /wizard/1 */}
+                            <Route path="/wizard" element={<Navigate to="/wizard/1" replace />} />
 
-                        {/* Results page */}
-                        <Route path="/results" element={<ResultsPage />} />
+                            {/* Results page */}
+                            <Route path="/results" element={<ResultsPage />} />
 
-                        {/* Catch-all redirect to landing */}
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                        
-                        <Route path="/scenarios" element={<ScenariosPage />} />
-                        <Route path="/compare" element={<ComparisonPage />} />
-                        <Route path="/state-tax-comparison" element={<StateTaxComparisonPage />} />
-                    </Routes>
-                </ResultsProvider>
-            </InputsProvider>
-        </BrowserRouter>
+                            {/* Catch-all redirect to landing */}
+                            <Route path="*" element={<Navigate to="/" replace />} />
+
+                            <Route path="/scenarios" element={<ScenariosPage />} />
+                            <Route path="/compare" element={<ComparisonPage />} />
+                            <Route path="/state-tax-comparison" element={<StateTaxComparisonPage />} />
+                        </Routes>
+                    </ResultsProvider>
+                </InputsProvider>
+            </BrowserRouter>
+        </ErrorBoundary>
     );
 }
 
