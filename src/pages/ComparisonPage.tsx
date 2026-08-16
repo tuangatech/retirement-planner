@@ -1,5 +1,4 @@
 // src/pages/ComparisonPage.tsx
-// ✅ UPDATED: Added unified Header and Footer components
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -7,7 +6,7 @@ import { loadScenario } from '@/lib/storage/scenarioStorage';
 import { ScenarioPanel } from '@/components/comparison/ScenarioPanel';
 import { DifferenceSummary } from '@/components/comparison/DifferenceSummary';
 import { ResultsComparison } from '@/components/comparison/ResultsComparison';
-import { Header } from '@/components/common/Header'; // ✅ NEW: Import Header
+import { Header } from '@/components/common/Header';
 import { Footer } from '@/components/common/Footer';
 import type { SavedScenario } from '@/lib/storage/scenarioStorage';
 

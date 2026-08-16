@@ -1,11 +1,10 @@
 // src/pages/ScenariosPage.tsx
-// ✅ UPDATED: Added unified Header and Footer components
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllScenarios, deleteScenario, saveScenario, ScenarioStorage, MAX_SCENARIOS } from '@/lib/storage/scenarioStorage';
 import { ScenarioCard } from '@/components/scenarios/ScenarioCard';
-import { Header } from '@/components/common/Header'; // ✅ NEW: Import Header
+import { Header } from '@/components/common/Header';
 import { Footer } from '@/components/common/Footer';
 import { GitCompare, ArrowLeft, Save, AlertCircle } from 'lucide-react';
 import type { SavedScenario } from '@/lib/storage/scenarioStorage';
@@ -141,7 +140,6 @@ export default function ScenariosPage() {
 
     if (scenarios.length === 0) {
         return (
-            // ✅ UPDATED: Added unified Header
             <div className="min-h-screen bg-gray-50 flex flex-col">
                 <Header variant="navigation" />
                 <div className="flex-1 flex items-center justify-center">
@@ -329,7 +327,6 @@ export default function ScenariosPage() {
                 </div>
             </div>
 
-            {/* ✅ Footer */}
             <Footer />
 
             {/* Save Dialog */}

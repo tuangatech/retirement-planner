@@ -1,4 +1,4 @@
-// src/contexts/InputsContext.tsx - PHASE B: Add HSA Support
+// src/contexts/InputsContext.tsx
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import type {
@@ -246,9 +246,9 @@ export function InputsProvider({ children }: { children: ReactNode }) {
         <InputsContext.Provider
             value={{
                 inputs,
-                currentScenarioId,  // ✅ NEW
-                currentScenarioName,  // ✅ NEW
-                setCurrentScenario,  // ✅ NEW
+                currentScenarioId,
+                currentScenarioName,
+                setCurrentScenario,
                 updatePersonal,
                 updatePhases,
                 addOneTimeExpense,

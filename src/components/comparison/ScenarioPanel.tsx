@@ -98,7 +98,6 @@ export function ScenarioPanel({ scenario, side }: ScenarioPanelProps) {
                 </div>
             </div>
 
-            {/* ✅ UPDATED: Account Balances - HSA integrated with same styling as other accounts */}
             <div className="p-6 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Investment Accounts</h3>
                 <div className="space-y-3">
@@ -126,7 +125,6 @@ export function ScenarioPanel({ scenario, side }: ScenarioPanelProps) {
                             </span>
                         </div>
                     )}
-                    {/* ✅ UPDATED: HSA styled consistently with other accounts */}
                     {inputs.accounts.hsa.balanceAtRetirement > 0 && (
                         <div className="flex justify-between items-center text-sm">
                             <div className="flex items-center gap-1.5">

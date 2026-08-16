@@ -1,4 +1,4 @@
-// src/lib/constants.ts - PHASE B: Add HSA Defaults
+// src/lib/constants.ts
 
 import type { SocialSecurity, USState, UserInputs } from '@/types';
 

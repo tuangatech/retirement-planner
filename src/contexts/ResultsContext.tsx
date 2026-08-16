@@ -43,12 +43,12 @@ export function ResultsProvider({ children }: { children: ReactNode }) {
                         setIsCalculating(false)
                         setCalculationProgress(100)
                         worker.terminate()
-                        resolve()   // ✅ Resolve when done
+                        resolve()
                     } else if (e.data.type === 'ERROR') {
                         setError(e.data.error)
                         setIsCalculating(false)
                         worker.terminate()
-                        reject(new Error(e.data.error));  // ✅ Reject on error
+                        reject(new Error(e.data.error));
                     }
                 }
 
@@ -57,7 +57,7 @@ export function ResultsProvider({ children }: { children: ReactNode }) {
                     setError(`Calculation error: ${error.message}`)
                     setIsCalculating(false)
                     worker.terminate()
-                    reject(error);  // ✅ Reject on error
+                    reject(error);
                 }
 
                 // Send inputs to worker
@@ -70,7 +70,7 @@ export function ResultsProvider({ children }: { children: ReactNode }) {
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Calculation failed')
                 setIsCalculating(false)
-                reject(err);  // ✅ Reject on error
+                reject(err);
             }
         });
     }

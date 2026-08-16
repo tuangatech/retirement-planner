@@ -135,7 +135,7 @@ export interface UserInputs {
         taxDeferred: InvestmentAccount;
         roth: InvestmentAccount;
         taxable: InvestmentAccount;
-        hsa: HSAAccount;  // ✅ NEW
+        hsa: HSAAccount;
     };
     withdrawalStrategy: {
         priorityOrder: Array<'taxable' | 'tax_deferred' | 'roth'>;

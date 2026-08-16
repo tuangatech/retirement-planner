@@ -6,9 +6,9 @@ import type { SavedScenario } from '@/lib/storage/scenarioStorage';
 interface ScenarioCardProps {
     scenario: SavedScenario;
     selectionMode?: boolean;
-    quickCompareMode?: boolean;  // ✅ NEW: For instant comparison navigation
+    quickCompareMode?: boolean;  // For instant comparison navigation
     isSelected?: boolean;
-    currentScenarioId?: string | null;  // ✅ NEW: To show "Currently Loaded" indicator
+    currentScenarioId?: string | null;  // To show "Currently Loaded" indicator
     onSelect?: () => void;
     onDelete: () => void;
     onLoad: () => void;
@@ -17,9 +17,9 @@ interface ScenarioCardProps {
 export function ScenarioCard({
     scenario,
     selectionMode = false,
-    quickCompareMode = false,  // ✅ NEW
+    quickCompareMode = false,
     isSelected = false,
-    currentScenarioId = null,  // ✅ NEW
+    currentScenarioId = null,
     onSelect,
     onDelete,
     onLoad,
@@ -47,27 +47,27 @@ export function ScenarioCard({
         return 'bg-red-100 text-red-800 border-red-300';
     };
 
-    // ✅ UPDATED: Card is clickable in BOTH selection mode AND quick compare mode
+    // Card is clickable in both selection mode and quick compare mode
     const isClickable = selectionMode || quickCompareMode;
     const isCurrentlyLoaded = currentScenarioId === scenario.id;
 
     return (
         <div
             className={`bg-white rounded-lg shadow hover:shadow-lg transition-all p-6 relative ${quickCompareMode
-                    ? 'cursor-pointer hover:ring-2 hover:ring-blue-500'  // ✅ Special styling for quick compare
+                    ? 'cursor-pointer hover:ring-2 hover:ring-blue-500'  // special styling for quick compare
                     : selectionMode
                         ? 'cursor-pointer'
                         : ''
                 } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
             onClick={isClickable ? onSelect : undefined}
         >
-            {/* ✅ NEW: Currently Loaded Indicator */}
+            {/* Currently Loaded Indicator */}
             {isCurrentlyLoaded && (
                 <div className="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium">
                     Currently Loaded
                 </div>
             )}
-            {/* ✅ UPDATED: Selection Checkbox - Only show in manual selection mode, NOT in quick compare */}
+            {/* Selection checkbox — only in manual selection mode, not quick compare */}
             {selectionMode && !quickCompareMode && (
                 <div className="mb-4">
                     <input
@@ -122,7 +122,7 @@ export function ScenarioCard({
                 Saved {new Date(createdAt).toLocaleDateString()}
             </div>
 
-            {/* ✅ UPDATED: Action buttons - Hide in BOTH selection mode AND quick compare mode */}
+            {/* Action buttons — hidden in both selection mode and quick compare mode */}
             {!selectionMode && !quickCompareMode && (
                 <div className="flex items-center gap-2">
                     <button

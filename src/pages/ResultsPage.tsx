@@ -123,7 +123,7 @@ export default function ResultsPage() {
             <Header variant="results" />
 
             <div className="w-full max-w-6xl mx-auto px-4 py-8 space-y-6 flex-1">
-                {/* ✅ CRITICAL ALERTS - HIGHEST PRIORITY - ABOVE ALL OTHER CONTENT */}
+                {/* Critical alerts — shown above all other content */}
                 {successRate < 50 && (
                     <Alert variant="destructive" className="border-2">
                         <AlertCircle className="h-5 w-5" />

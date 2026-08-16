@@ -1,5 +1,4 @@
 // src/pages/WizardPage.tsx
-// ✅ UPDATED: Now uses unified Header component with variant="wizard"
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -84,13 +83,11 @@ export default function WizardPage() {
         // Run calculation
         await calculate(inputs);
 
-        // Navigate to results (trackCalculationComplete happens in ResultsContext)
         navigate('/results');
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col">
-            {/* ✅ UPDATED: Now passing variant="wizard" to unified Header */}
             <Header variant="wizard" />
 
             <main className="w-full max-w-6xl mx-auto px-4 py-8 flex-1">
@@ -147,7 +144,6 @@ export default function WizardPage() {
                 />
             </main>
 
-            {/* ✅ NEW: Footer on all pages */}
             <Footer />
 
             {/* Disclosures modal — reuses AssumptionsPanel so there's one source of truth */}

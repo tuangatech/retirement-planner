@@ -109,11 +109,6 @@ function runMonteCarloSimulation(
     // Storage for full projections (selected runs only)
     const fullProjectionRuns = new Map<number, YearlyProjection[]>();
 
-    // ✅ REMOVED: Don't calculate indices upfront
-    // const p10Index = Math.floor(numberOfRuns * 0.10);
-    // const p50Index = Math.floor(numberOfRuns * 0.50);
-    // const p90Index = Math.floor(numberOfRuns * 0.90);
-
     // Random sample for spaghetti chart (max 200 runs)
     const sampleSize = Math.min(200, Math.floor(numberOfRuns * 0.2));
     const sampleIndices = selectRandomSample(numberOfRuns, sampleSize);

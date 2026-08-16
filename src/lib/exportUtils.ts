@@ -6,7 +6,6 @@ export function exportResultsToCSV(
     results: SimulationResults,
     _inputs: UserInputs
 ) {
-    // ✅ Correct nested path
     const medianProjections = results.selectedRuns.p50.projections
 
     const headers = [

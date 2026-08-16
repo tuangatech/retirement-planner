@@ -1,4 +1,4 @@
-// src/lib/calculations/withdrawals.ts - PHASE B: Add HSA Support
+// src/lib/calculations/withdrawals.ts
 
 import { calculateRMD } from './rmd';
 import {
@@ -468,7 +468,7 @@ export function validateWithdrawalInputs(
 }
 
 export function calculateTotalPortfolio(balances: AccountBalances): number {
-    return balances.taxDeferred + balances.roth + balances.taxable + balances.hsa;  // ✅ UPDATED
+    return balances.taxDeferred + balances.roth + balances.taxable + balances.hsa;
 }
 
 export function isPortfolioDepleted(

@@ -126,7 +126,7 @@ export default function CashFlowChart({ results, inputs }: CashFlowChartProps) {
                     {expensePortfolioItems.map((entry: any, index: number) => (
                         <div key={`expense-${index}`} className="flex items-center gap-1.5">
                             {entry.type === 'line' ? (
-                                // ✅ FIXED: Show dashed line for HSA in legend
+                                // Dashed line for HSA in legend
                                 <svg width="16" height="12" className="flex-shrink-0">
                                     <line
                                         x1="0"
@@ -210,7 +210,7 @@ export default function CashFlowChart({ results, inputs }: CashFlowChartProps) {
                             cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
                         />
 
-                        {/* ✅ NEW: Custom two-row legend */}
+                        {/* Custom two-row legend */}
                         <Legend
                             content={renderLegend}
                             wrapperStyle={{
@@ -264,7 +264,7 @@ export default function CashFlowChart({ results, inputs }: CashFlowChartProps) {
                             opacity={1.0}
                         />
 
-                        {/* ✅ HSA Balance Line (teal, dashed, subtle) */}
+                        {/* HSA balance line (teal, dashed, subtle) */}
                         <Line
                             yAxisId="right"
                             type="monotone"
@@ -274,7 +274,7 @@ export default function CashFlowChart({ results, inputs }: CashFlowChartProps) {
                             strokeDasharray="3 3"
                             dot={false}
                             name="HSA Balance"
-                            opacity={0.6}  // ✅ Subtle reference
+                            opacity={0.6}
                         />
                     </ComposedChart>
                 </ResponsiveContainer>

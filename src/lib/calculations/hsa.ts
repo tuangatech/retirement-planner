@@ -1,4 +1,4 @@
-// src/lib/calculations/hsa.ts - PHASE B: NEW HSA Calculation Module
+// src/lib/calculations/hsa.ts
 
 /**
  * HSA (Health Savings Account) Calculations Module

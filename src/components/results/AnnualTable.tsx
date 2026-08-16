@@ -71,7 +71,7 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
     }, [projections]);
 
     const exportToCSV = () => {
-        // ✅ COMPREHENSIVE CSV: All account details for spreadsheet analysis
+        // Comprehensive CSV: all account details for spreadsheet analysis
         const headers = [
             // Timeline
             'Age', 'Year', 'Phase',
@@ -188,7 +188,7 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
                     </div>
                 </div>
 
-                {/* ✅ CLEAN TABLE: 8 columns for easy scanning */}
+                {/* 8 columns for easy scanning */}
                 <TooltipProvider delayDuration={100}>
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[640px] text-sm table-fixed">

@@ -1,4 +1,4 @@
-// src/lib/calculations/random.ts - PHASE B: Add HSA Support
+// src/lib/calculations/random.ts
 
 /**
  * Random Number Generation Module

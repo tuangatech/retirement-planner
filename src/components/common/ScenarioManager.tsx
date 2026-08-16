@@ -103,7 +103,7 @@ export const ScenarioManager = React.forwardRef<ScenarioManagerHandle, ScenarioM
             }
         };
 
-        // ✅ FIXED: Only for creating NEW scenarios (never updates existing)
+        // Only for creating new scenarios (never updates existing)
         const handleSave = () => {
             if (!validateName(scenarioName)) {
                 return;
@@ -112,12 +112,11 @@ export const ScenarioManager = React.forwardRef<ScenarioManagerHandle, ScenarioM
             setSaveError('');
 
             try {
-                // ✅ CAPTURE the returned scenario
                 const savedScenario = ScenarioStorage.saveScenario(scenarioName, inputs, results);
 
                 if (savedScenario) {
-                    // ✅ CRITICAL FIX: UPDATE the current scenario in context
-                    // This makes the "Compare with..." button appear immediately
+                    // Update the current scenario in context so the "Compare with..."
+                    // button appears immediately
                     setCurrentScenario(savedScenario.id, savedScenario.name);
                 }
 

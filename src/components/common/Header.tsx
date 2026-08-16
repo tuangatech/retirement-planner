@@ -41,15 +41,15 @@ export function Header({ variant = 'wizard' }: HeaderProps) {
         <header className="bg-white shadow-sm border-b">
             <div className="max-w-6xl mx-auto px-4 py-4">
                 <div className="flex justify-between items-center">
-                    {/* ✅ LEFT SIDE: Logo (links to home) */}
+                    {/* Logo (links to home) */}
                     <button onClick={() => navigate('/')} className="focus:outline-none">
                         <img src="/logo-app.png" alt="Will It Last? Retirement Planner" className="h-14 w-auto" />
                     </button>
 
-                    {/* ✅ RIGHT SIDE: Context-aware action buttons */}
+                    {/* Context-aware action buttons */}
                     <div className="flex items-center gap-4">
                         {variant === 'wizard' ? (
-                            // ✅ WIZARD MODE: My Scenarios + Mode Toggle + Reset
+                            // Wizard mode: My Scenarios + Mode Toggle + Reset
                             <>
                                 {/* My Scenarios button */}
                                 <button
@@ -93,7 +93,7 @@ export function Header({ variant = 'wizard' }: HeaderProps) {
                                 </button>
                             </>
                         ) : variant === 'results' ? (
-                            // ✅ RESULTS MODE: Back to Wizard + Save + Export + My Scenarios
+                            // Results mode: Back to Wizard + Save + Export + My Scenarios
                             <>
                                 {/* Back to Wizard */}
                                 <button

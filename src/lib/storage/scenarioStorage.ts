@@ -67,8 +67,8 @@ export class ScenarioStorage {
     }
 
     /**
-     * ✅ NEW: Slim down results to only essential data for comparison
-     * This dramatically reduces storage size (from ~12MB to ~50KB)
+     * Slim down results to only essential data for comparison.
+     * This dramatically reduces storage size (from ~12MB to ~50KB).
      */
     private static slimResults(results: SimulationResults): SimulationResults {
         // Keep the essential data for comparison:
@@ -94,7 +94,7 @@ export class ScenarioStorage {
         const scenarioId = id || this.generateId();
         const now = Date.now();
 
-        // ✅ NEW: Slim down results before saving
+        // Slim down results before saving
         const slimmedResults = results ? this.slimResults(results) : undefined;
 
         const scenario: SavedScenario = {
@@ -143,8 +143,7 @@ export class ScenarioStorage {
         const netNewSize = scenarioSize - oldScenarioSize;
         const estimatedNewUsage = storageInfo.used + netNewSize;
 
-        // ✅ UPDATED: More lenient threshold (95% instead of 90%)
-        // Also provide better error message with actual numbers
+        // Lenient threshold (95%) with an error message that includes actual numbers
         if (estimatedNewUsage > storageInfo.total * 0.95) {
             const availableSpace = (storageInfo.total * 0.95) - storageInfo.used;
             throw new StorageError(

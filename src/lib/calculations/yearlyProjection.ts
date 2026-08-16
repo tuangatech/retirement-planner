@@ -1,4 +1,4 @@
-// src/lib/calculations/yearlyProjection.ts - PHASE B: Add HSA Support
+// src/lib/calculations/yearlyProjection.ts
 
 import type { UserInputs } from '@/types';
 import { determinePhase, calculateYearlyExpenses } from '@/lib/calculations/expenses';
@@ -58,17 +58,17 @@ export interface YearlyProjection {
             taxDeferred: number;
             roth: number;
             taxable: number;
-            hsa: number;  // ✅ NEW
+            hsa: number;
             total: number;
         };
         rmdAmount: number;
         rmdExcess: number;
-        hsaForHealthcare: number;  // ✅ NEW: Tax-free healthcare coverage
+        hsaForHealthcare: number;  // Tax-free healthcare coverage
         investmentReturns: {
             taxDeferred: number;
             roth: number;
             taxable: number;
-            hsa: number;  // ✅ NEW
+            hsa: number;
             total: number;
         };
         balances: AccountBalances & { total: number };
@@ -191,14 +191,14 @@ export function calculateYearlyProjection(
     let updatedBalances = { ...currentBalances };
     let portfolioIsDepleted = false;
 
-    // ✅ UPDATED: STEP 6 - Execute withdrawals (HSA-aware)
+    // STEP 6: Execute withdrawals (HSA-aware)
     if (cashFlowGap > 0) {
         withdrawalResult = executeWithdrawals(
             currentAge,
             cashFlowGap,
             currentBalances,
-            expensesResult.healthcarePremiums + expensesResult.healthcareOutOfPocket,  // ✅ NEW: Total healthcare
-            accounts.hsa.allowNonMedicalAfter65,  // ✅ NEW: HSA policy
+            expensesResult.healthcarePremiums + expensesResult.healthcareOutOfPocket,  // total healthcare cost
+            accounts.hsa.allowNonMedicalAfter65,  // HSA non-medical withdrawal policy
             inputs.withdrawalStrategy.priorityOrder,
             {
                 socialSecurity: incomeResult.socialSecurity,
@@ -249,7 +249,7 @@ export function calculateYearlyProjection(
         updatedBalances.taxDeferred = currentBalances.taxDeferred - withdrawalResult.withdrawals.taxDeferred;
         updatedBalances.roth = currentBalances.roth - withdrawalResult.withdrawals.roth;
         updatedBalances.taxable = currentBalances.taxable - withdrawalResult.withdrawals.taxable;
-        updatedBalances.hsa = currentBalances.hsa - withdrawalResult.withdrawals.hsa;  // ✅ NEW
+        updatedBalances.hsa = currentBalances.hsa - withdrawalResult.withdrawals.hsa;
 
         portfolioIsDepleted = isPortfolioDepleted(updatedBalances);
     } else {
@@ -258,12 +258,12 @@ export function calculateYearlyProjection(
         updatedBalances = handleSurplus(surplus, currentBalances);
 
         withdrawalResult = {
-            withdrawals: { taxDeferred: 0, roth: 0, taxable: 0, hsa: 0 },  // ✅ UPDATED
+            withdrawals: { taxDeferred: 0, roth: 0, taxable: 0, hsa: 0 },
             taxOnWithdrawals: 0,
             updatedBalances,
             rmdAmount: 0,
             rmdExcess: surplus,
-            hsaForHealthcare: 0,  // ✅ NEW
+            hsaForHealthcare: 0,
             iterations: 1,
             converged: true,
             shortfall: 0,
@@ -335,13 +335,13 @@ export function calculateYearlyProjection(
         updatedBalances.taxable += netCashFlow;
     }
 
-    // ✅ UPDATED: STEP 7 - Apply investment returns (including HSA)
+    // STEP 7: Apply investment returns (including HSA)
     const returns = generateAccountReturns(
         {
             taxDeferred: accounts.taxDeferred.expectedReturnRate,
             roth: accounts.roth.expectedReturnRate,
             taxable: accounts.taxable.expectedReturnRate,
-            hsa: accounts.hsa.expectedReturnRate,  // ✅ NEW
+            hsa: accounts.hsa.expectedReturnRate,
         },
         simulation.returnStdDeviation,
         rng
@@ -352,20 +352,20 @@ export function calculateYearlyProjection(
         taxDeferred: updatedBalances.taxDeferred * returns.taxDeferred,
         roth: updatedBalances.roth * returns.roth,
         taxable: updatedBalances.taxable * returns.taxable,
-        hsa: updatedBalances.hsa * returns.hsa,  // ✅ NEW
+        hsa: updatedBalances.hsa * returns.hsa,
         total: 0,
     };
     investmentReturns.total =
         investmentReturns.taxDeferred +
         investmentReturns.roth +
         investmentReturns.taxable +
-        investmentReturns.hsa;  // ✅ UPDATED
+        investmentReturns.hsa;
 
     // Apply returns to balances
     updatedBalances.taxDeferred += investmentReturns.taxDeferred;
     updatedBalances.roth += investmentReturns.roth;
     updatedBalances.taxable += investmentReturns.taxable;
-    updatedBalances.hsa += investmentReturns.hsa;  // ✅ NEW
+    updatedBalances.hsa += investmentReturns.hsa;
 
     const totalContributions = 0;
 
@@ -373,7 +373,7 @@ export function calculateYearlyProjection(
     updatedBalances.taxDeferred = Math.max(0, updatedBalances.taxDeferred);
     updatedBalances.roth = Math.max(0, updatedBalances.roth);
     updatedBalances.taxable = Math.max(0, updatedBalances.taxable);
-    updatedBalances.hsa = Math.max(0, updatedBalances.hsa);  // ✅ NEW
+    updatedBalances.hsa = Math.max(0, updatedBalances.hsa);
 
     // STEP 8: Assemble complete projection
     return {
@@ -413,18 +413,18 @@ export function calculateYearlyProjection(
                 taxDeferred: withdrawalResult.withdrawals.taxDeferred,
                 roth: withdrawalResult.withdrawals.roth,
                 taxable: withdrawalResult.withdrawals.taxable,
-                hsa: withdrawalResult.withdrawals.hsa,  // ✅ NEW
+                hsa: withdrawalResult.withdrawals.hsa,
                 total: totalWithdrawals,
             },
             rmdAmount: withdrawalResult.rmdAmount,
             rmdExcess: withdrawalResult.rmdExcess,
-            hsaForHealthcare: withdrawalResult.hsaForHealthcare,  // ✅ NEW
+            hsaForHealthcare: withdrawalResult.hsaForHealthcare,
             investmentReturns,
             balances: {
                 taxDeferred: updatedBalances.taxDeferred,
                 roth: updatedBalances.roth,
                 taxable: updatedBalances.taxable,
-                hsa: updatedBalances.hsa,  // ✅ NEW
+                hsa: updatedBalances.hsa,
                 total: calculateTotalPortfolio(updatedBalances),
             },
         },
@@ -436,7 +436,7 @@ export function calculateYearlyProjection(
 }
 
 /**
- * ✅ UPDATED: Runs ONLY from retirement age to life expectancy (with HSA)
+ * Runs ONLY from retirement age to life expectancy (with HSA).
  */
 export function runCompleteSimulation(
     inputs: UserInputs,
@@ -450,12 +450,12 @@ export function runCompleteSimulation(
     const { personal, accounts } = inputs;
     const projections: YearlyProjection[] = [];
 
-    // ✅ UPDATED: Initialize balances including HSA
+    // Initialize balances including HSA
     let currentBalances: AccountBalances = {
         taxDeferred: accounts.taxDeferred.balanceAtRetirement,
         roth: accounts.roth.balanceAtRetirement,
         taxable: accounts.taxable.balanceAtRetirement,
-        hsa: accounts.hsa.balanceAtRetirement,  // ✅ NEW
+        hsa: accounts.hsa.balanceAtRetirement,
     };
 
     let ageOfDepletion: number | null = null;
@@ -479,7 +479,7 @@ export function runCompleteSimulation(
             taxDeferred: projection.portfolio.balances.taxDeferred,
             roth: projection.portfolio.balances.roth,
             taxable: projection.portfolio.balances.taxable,
-            hsa: projection.portfolio.balances.hsa,  // ✅ NEW
+            hsa: projection.portfolio.balances.hsa,
         };
 
         // Check for portfolio depletion
@@ -528,7 +528,7 @@ export function validateProjectionInputs(
     }
 
     if (currentBalances.taxDeferred < 0 || currentBalances.roth < 0 ||
-        currentBalances.taxable < 0 || currentBalances.hsa < 0) {  // ✅ UPDATED
+        currentBalances.taxable < 0 || currentBalances.hsa < 0) {
         errors.push('Account balances cannot be negative');
     }
 
