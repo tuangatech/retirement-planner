@@ -4,6 +4,7 @@ import { useInputs } from '@/contexts/InputsContext';
 import { DEFAULT_VALUES } from '@/lib/constants';
 import { AlertCircle } from 'lucide-react';
 import { CollapsibleHelpPanel } from '@/components/common/CollapsibleHelpPanel';
+import { CurrencyField } from '@/components/common/CurrencyField';
 import { HelpPopover } from '@/components/common/HelpPopover';
 import { InlineGuidance } from '@/components/common/InlineGuidance';
 import { ScopeBadge } from '@/components/common/ScopeBadge';
@@ -117,47 +118,25 @@ export function Screen3Healthcare() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Monthly Insurance Premium</label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-2 text-gray-500">$</span>
-                            <input
-                                type="number"
-                                value={healthcare.preMedicare.monthlyPremium}
-                                onChange={(e) =>
-                                    updateHealthcare('preMedicare', {
-                                        ...healthcare.preMedicare,
-                                        monthlyPremium: parseFloat(e.target.value) || 0,
-                                    })
-                                }
-                                className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                step="25"
-                                min="0"
-                            />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">Typical: $600–1,200/month per person</p>
-                    </div>
+                    <CurrencyField
+                        label="Monthly Insurance Premium"
+                        value={healthcare.preMedicare.monthlyPremium}
+                        onChange={(monthlyPremium) =>
+                            updateHealthcare('preMedicare', { ...healthcare.preMedicare, monthlyPremium })
+                        }
+                        step={25}
+                        helperText="Typical: $600–1,200/month per person"
+                    />
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Annual Out-of-Pocket Expenses (Age &lt; 65)</label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-2 text-gray-500">$</span>
-                            <input
-                                type="number"
-                                value={healthcare.preMedicare.annualOutOfPocket}
-                                onChange={(e) =>
-                                    updateHealthcare('preMedicare', {
-                                        ...healthcare.preMedicare,
-                                        annualOutOfPocket: parseFloat(e.target.value) || 0,
-                                    })
-                                }
-                                className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                step="100"
-                                min="0"
-                            />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">Deductibles, copays, prescriptions</p>
-                    </div>
+                    <CurrencyField
+                        label="Annual Out-of-Pocket Expenses (Age < 65)"
+                        value={healthcare.preMedicare.annualOutOfPocket}
+                        onChange={(annualOutOfPocket) =>
+                            updateHealthcare('preMedicare', { ...healthcare.preMedicare, annualOutOfPocket })
+                        }
+                        step={100}
+                        helperText="Deductibles, copays, prescriptions"
+                    />
                 </div>
 
                 <InlineGuidance variant="example" className="mt-3">
@@ -185,9 +164,9 @@ export function Screen3Healthcare() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                        <label className="flex items-center gap-2 text-sm font-medium mb-1">
-                            Part B Standard Premium
+                    <CurrencyField
+                        label="Part B Standard Premium"
+                        help={
                             <HelpPopover>
                                 <p className="mb-2">Covers doctor visits, outpatient care, preventive services.</p>
                                 <p className="font-medium mb-1">Pricing:</p>
@@ -197,29 +176,18 @@ export function Screen3Healthcare() {
                                     <li>The simulator applies the healthcare inflation rate from Step 6 (default {(DEFAULT_VALUES.simulation.healthcareInflationRate * 100).toFixed(0)}%)</li>
                                 </ul>
                             </HelpPopover>
-                        </label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-2 text-gray-500">$</span>
-                            <input
-                                type="number"
-                                value={healthcare.medicare.partBStandardPremium}
-                                onChange={(e) =>
-                                    updateHealthcare('medicare', {
-                                        ...healthcare.medicare,
-                                        partBStandardPremium: parseFloat(e.target.value) || 0,
-                                    })
-                                }
-                                className="w-full pl-7 pr-10 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                step="5"
-                                min="0"
-                            />
-                            <span className="absolute right-3 top-2 text-gray-500">/mo</span>
-                        </div>
-                    </div>
+                        }
+                        value={healthcare.medicare.partBStandardPremium}
+                        onChange={(partBStandardPremium) =>
+                            updateHealthcare('medicare', { ...healthcare.medicare, partBStandardPremium })
+                        }
+                        step={5}
+                        suffix="/mo"
+                    />
 
-                    <div>
-                        <label className="flex items-center gap-2 text-sm font-medium mb-1">
-                            Part D Premium
+                    <CurrencyField
+                        label="Part D Premium"
+                        help={
                             <HelpPopover>
                                 <p className="mb-2">Prescription drug coverage through private insurers.</p>
                                 <p className="font-medium mb-1">Costs vary widely:</p>
@@ -232,29 +200,18 @@ export function Screen3Healthcare() {
                                     Choose based on your prescriptions and pharmacy network.
                                 </p>
                             </HelpPopover>
-                        </label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-2 text-gray-500">$</span>
-                            <input
-                                type="number"
-                                value={healthcare.medicare.partDPremium}
-                                onChange={(e) =>
-                                    updateHealthcare('medicare', {
-                                        ...healthcare.medicare,
-                                        partDPremium: parseFloat(e.target.value) || 0,
-                                    })
-                                }
-                                className="w-full pl-7 pr-10 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                step="5"
-                                min="0"
-                            />
-                            <span className="absolute right-3 top-2 text-gray-500">/mo</span>
-                        </div>
-                    </div>
+                        }
+                        value={healthcare.medicare.partDPremium}
+                        onChange={(partDPremium) =>
+                            updateHealthcare('medicare', { ...healthcare.medicare, partDPremium })
+                        }
+                        step={5}
+                        suffix="/mo"
+                    />
 
-                    <div>
-                        <label className="flex items-center gap-2 text-sm font-medium mb-1">
-                            Medigap Premium
+                    <CurrencyField
+                        label="Medigap Premium"
+                        help={
                             <HelpPopover title="Medigap (Supplemental Insurance)">
                                 <p className="mb-2">
                                     Covers gaps in Original Medicare (copays, coinsurance, deductibles).
@@ -269,25 +226,14 @@ export function Screen3Healthcare() {
                                     💡 Plans vary by state and age — prices increase as you age
                                 </p>
                             </HelpPopover>
-                        </label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-2 text-gray-500">$</span>
-                            <input
-                                type="number"
-                                value={healthcare.medicare.medigapPremium}
-                                onChange={(e) =>
-                                    updateHealthcare('medicare', {
-                                        ...healthcare.medicare,
-                                        medigapPremium: parseFloat(e.target.value) || 0,
-                                    })
-                                }
-                                className="w-full pl-7 pr-10 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                step="5"
-                                min="0"
-                            />
-                            <span className="absolute right-3 top-2 text-gray-500">/mo</span>
-                        </div>
-                    </div>
+                        }
+                        value={healthcare.medicare.medigapPremium}
+                        onChange={(medigapPremium) =>
+                            updateHealthcare('medicare', { ...healthcare.medicare, medigapPremium })
+                        }
+                        step={5}
+                        suffix="/mo"
+                    />
 
                     {mode === 'advanced' && (
                         <div>
@@ -344,23 +290,14 @@ export function Screen3Healthcare() {
                                 </label>
                             </div>
                             {healthcare.medicare.expectIRMAA && (
-                                <div className="relative">
-                                    <span className="absolute left-3 top-2 text-gray-500">$</span>
-                                    <input
-                                        type="number"
-                                        value={healthcare.medicare.irmaaSurcharge}
-                                        onChange={(e) =>
-                                            updateHealthcare('medicare', {
-                                                ...healthcare.medicare,
-                                                irmaaSurcharge: parseFloat(e.target.value) || 0,
-                                            })
-                                        }
-                                        className="w-full pl-7 pr-10 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                        step="10"
-                                        min="0"
-                                    />
-                                    <span className="absolute right-3 top-2 text-gray-500">/mo</span>
-                                </div>
+                                <CurrencyField
+                                    value={healthcare.medicare.irmaaSurcharge}
+                                    onChange={(irmaaSurcharge) =>
+                                        updateHealthcare('medicare', { ...healthcare.medicare, irmaaSurcharge })
+                                    }
+                                    step={10}
+                                    suffix="/mo"
+                                />
                             )}
                             <p className="text-xs text-gray-500 mt-1">
                                 Income surcharge for high earners ($70–$420/mo)
@@ -390,74 +327,41 @@ export function Screen3Healthcare() {
                         </HelpPopover>
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Go-Go Years</label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-2 text-gray-500">$</span>
-                                <input
-                                    type="number"
-                                    value={healthcare.medicare.outOfPocketByPhase.phase1}
-                                    onChange={(e) =>
-                                        updateHealthcare('medicare', {
-                                            ...healthcare.medicare,
-                                            outOfPocketByPhase: {
-                                                ...healthcare.medicare.outOfPocketByPhase,
-                                                phase1: parseFloat(e.target.value) || 0,
-                                            },
-                                        })
-                                    }
-                                    className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                    step="100"
-                                    min="0"
-                                />
-                            </div>
-                        </div>
+                        <CurrencyField
+                            label="Go-Go Years"
+                            value={healthcare.medicare.outOfPocketByPhase.phase1}
+                            onChange={(phase1) =>
+                                updateHealthcare('medicare', {
+                                    ...healthcare.medicare,
+                                    outOfPocketByPhase: { ...healthcare.medicare.outOfPocketByPhase, phase1 },
+                                })
+                            }
+                            step={100}
+                        />
 
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Slow-Go Years</label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-2 text-gray-500">$</span>
-                                <input
-                                    type="number"
-                                    value={healthcare.medicare.outOfPocketByPhase.phase2}
-                                    onChange={(e) =>
-                                        updateHealthcare('medicare', {
-                                            ...healthcare.medicare,
-                                            outOfPocketByPhase: {
-                                                ...healthcare.medicare.outOfPocketByPhase,
-                                                phase2: parseFloat(e.target.value) || 0,
-                                            },
-                                        })
-                                    }
-                                    className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                    step="100"
-                                    min="0"
-                                />
-                            </div>
-                        </div>
+                        <CurrencyField
+                            label="Slow-Go Years"
+                            value={healthcare.medicare.outOfPocketByPhase.phase2}
+                            onChange={(phase2) =>
+                                updateHealthcare('medicare', {
+                                    ...healthcare.medicare,
+                                    outOfPocketByPhase: { ...healthcare.medicare.outOfPocketByPhase, phase2 },
+                                })
+                            }
+                            step={100}
+                        />
 
-                        <div>
-                            <label className="block text-sm font-medium mb-1">No-Go Years</label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-2 text-gray-500">$</span>
-                                <input
-                                    type="number"
-                                    value={healthcare.medicare.outOfPocketByPhase.phase3}
-                                    onChange={(e) =>
-                                        updateHealthcare('medicare', {
-                                            ...healthcare.medicare,
-                                            outOfPocketByPhase: {
-                                                ...healthcare.medicare.outOfPocketByPhase,
-                                                phase3: parseFloat(e.target.value) || 0,
-                                            },
-                                        })
-                                    }
-                                    className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                    step="100"
-                                    min="0"
-                                />
-                            </div>
-                        </div>
+                        <CurrencyField
+                            label="No-Go Years"
+                            value={healthcare.medicare.outOfPocketByPhase.phase3}
+                            onChange={(phase3) =>
+                                updateHealthcare('medicare', {
+                                    ...healthcare.medicare,
+                                    outOfPocketByPhase: { ...healthcare.medicare.outOfPocketByPhase, phase3 },
+                                })
+                            }
+                            step={100}
+                        />
                     </div>
                 </div>
 

@@ -10,6 +10,8 @@ import { DEFAULT_VALUES, DEFAULT_SPOUSE_SOCIAL_SECURITY } from '@/lib/constants'
 import { Trash2, AlertCircle } from 'lucide-react';
 import type { Pension } from '@/types';
 import { CollapsibleHelpPanel } from '@/components/common/CollapsibleHelpPanel';
+import { CurrencyField } from '@/components/common/CurrencyField';
+import { PercentField } from '@/components/common/PercentField';
 import { HelpPopover } from '@/components/common/HelpPopover';
 import { InlineGuidance } from '@/components/common/InlineGuidance';
 import { ScopeBadge } from '@/components/common/ScopeBadge';
@@ -98,35 +100,33 @@ export function Screen2SavingsIncome() {
                         <p className="text-sm text-gray-600">{subtitle}</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Balance at Retirement</label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-2 text-gray-500">$</span>
-                                <input type="number" value={accounts[key].balanceAtRetirement}
-                                    onChange={(e) => updateAccount(key, { balanceAtRetirement: parseFloat(e.target.value) || 0 })}
-                                    className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="1000" min="0" />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Expected Annual Return</label>
-                            <div className="relative">
-                                <input type="number" value={(accounts[key].expectedReturnRate * 100).toFixed(1)}
-                                    onChange={(e) => updateAccount(key, { expectedReturnRate: parseFloat(e.target.value) / 100 || 0 })}
-                                    className="w-full pr-8 pl-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="0.1" min="-5" max="20" />
-                                <span className="absolute right-3 top-2 text-gray-500">%</span>
-                            </div>
-                        </div>
+                        <CurrencyField
+                            label="Balance at Retirement"
+                            value={accounts[key].balanceAtRetirement}
+                            onChange={(balanceAtRetirement) => updateAccount(key, { balanceAtRetirement })}
+                            step={1000}
+                        />
+                        <PercentField
+                            label="Expected Annual Return"
+                            value={accounts[key].expectedReturnRate}
+                            onChange={(expectedReturnRate) => updateAccount(key, { expectedReturnRate })}
+                            step={0.1}
+                            min={-5}
+                            max={20}
+                        />
                         {key === 'taxable' && isAdvanced && (
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium mb-1">Cost Basis Percentage</label>
-                                <div className="relative max-w-xs">
-                                    <input type="number" value={((accounts[key].costBasisPercentage || 0.7) * 100).toFixed(0)}
-                                        onChange={(e) => updateAccount(key, { costBasisPercentage: parseFloat(e.target.value) / 100 || 0.7 })}
-                                        className="w-full pr-8 pl-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="5" min="0" max="100" />
-                                    <span className="absolute right-3 top-2 text-gray-500">%</span>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-1">Portion that is original investment (not gains). Default {defaultCostBasisPct}%</p>
-                            </div>
+                            <PercentField
+                                label="Cost Basis Percentage"
+                                value={accounts[key].costBasisPercentage || 0.7}
+                                onChange={(costBasisPercentage) => updateAccount(key, { costBasisPercentage: costBasisPercentage || 0.7 })}
+                                step={5}
+                                min={0}
+                                max={100}
+                                decimals={0}
+                                className="md:col-span-2"
+                                inputWrapperClassName="max-w-xs"
+                                helperText={`Portion that is original investment (not gains). Default ${defaultCostBasisPct}%`}
+                            />
                         )}
                     </div>
                 </div>
@@ -142,25 +142,23 @@ export function Screen2SavingsIncome() {
                     <p className="text-sm text-gray-600">Used tax-free for healthcare</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Balance at Retirement</label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-2 text-gray-500">$</span>
-                            <input type="number" value={accounts.hsa.balanceAtRetirement}
-                                onChange={(e) => updateHSA({ balanceAtRetirement: parseFloat(e.target.value) || 0 })}
-                                className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-teal-500" step="1000" min="0" />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Expected Annual Return</label>
-                        <div className="relative">
-                            <input type="number" value={(accounts.hsa.expectedReturnRate * 100).toFixed(1)}
-                                onChange={(e) => updateHSA({ expectedReturnRate: parseFloat(e.target.value) / 100 || 0 })}
-                                className="w-full pr-8 pl-3 py-2 border rounded-md focus:ring-2 focus:ring-teal-500" step="0.1" min="-5" max="20" />
-                            <span className="absolute right-3 top-2 text-gray-500">%</span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">Conservative growth (5-7%)</p>
-                    </div>
+                    <CurrencyField
+                        label="Balance at Retirement"
+                        value={accounts.hsa.balanceAtRetirement}
+                        onChange={(balanceAtRetirement) => updateHSA({ balanceAtRetirement })}
+                        step={1000}
+                        inputClassName="focus:ring-teal-500"
+                    />
+                    <PercentField
+                        label="Expected Annual Return"
+                        value={accounts.hsa.expectedReturnRate}
+                        onChange={(expectedReturnRate) => updateHSA({ expectedReturnRate })}
+                        step={0.1}
+                        min={-5}
+                        max={20}
+                        inputClassName="focus:ring-teal-500"
+                        helperText="Conservative growth (5-7%)"
+                    />
                     {isAdvanced && (
                         <div className="md:col-span-2">
                             <label className="flex items-center gap-2 cursor-pointer">
@@ -222,32 +220,24 @@ export function Screen2SavingsIncome() {
                     </CollapsibleHelpPanel>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="flex items-center gap-2 text-sm font-medium mb-1">
-                                Monthly Benefit at FRA
-                                <HelpPopover><p>Baseline amount before early/delayed claiming adjustments (FRA is 67 for those born 1960+).</p></HelpPopover>
-                            </label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-2 text-gray-500">$</span>
-                                <input type="number" value={income.socialSecurity.monthlyBenefitAtFRA}
-                                    onChange={(e) => updateSocialSecurity({ monthlyBenefitAtFRA: parseFloat(e.target.value) || 0 })}
-                                    className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" min="0" step="50" />
-                            </div>
-                            <p className="text-xs text-gray-500 mt-1">From ssa.gov/myaccount</p>
-                        </div>
-                        <div>
-                            <label className="flex items-center gap-2 text-sm font-medium mb-1">
-                                Annual COLA Rate
-                                <HelpPopover><p>Cost-of-living adjustment. 10-year average ≈ 3.0%.</p></HelpPopover>
-                            </label>
-                            <div className="relative">
-                                <input type="number" value={(income.socialSecurity.colaRate * 100).toFixed(1)}
-                                    onChange={(e) => updateSocialSecurity({ colaRate: parseFloat(e.target.value) / 100 || 0 })}
-                                    className="w-full pr-8 pl-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="0.1" min="0" max="10" />
-                                <span className="absolute right-3 top-2 text-gray-500">%</span>
-                            </div>
-                            <p className="text-xs text-gray-500 mt-1">Default {(DEFAULT_VALUES.income.socialSecurity.colaRate * 100).toFixed(1)}%</p>
-                        </div>
+                        <CurrencyField
+                            label="Monthly Benefit at FRA"
+                            help={<HelpPopover><p>Baseline amount before early/delayed claiming adjustments (FRA is 67 for those born 1960+).</p></HelpPopover>}
+                            value={income.socialSecurity.monthlyBenefitAtFRA}
+                            onChange={(monthlyBenefitAtFRA) => updateSocialSecurity({ monthlyBenefitAtFRA })}
+                            step={50}
+                            helperText="From ssa.gov/myaccount"
+                        />
+                        <PercentField
+                            label="Annual COLA Rate"
+                            help={<HelpPopover><p>Cost-of-living adjustment. 10-year average ≈ 3.0%.</p></HelpPopover>}
+                            value={income.socialSecurity.colaRate}
+                            onChange={(colaRate) => updateSocialSecurity({ colaRate })}
+                            step={0.1}
+                            min={0}
+                            max={10}
+                            helperText={`Default ${(DEFAULT_VALUES.income.socialSecurity.colaRate * 100).toFixed(1)}%`}
+                        />
                         <div>
                             <label className="block text-sm font-medium mb-1">Claiming Age</label>
                             <input type="number" value={income.socialSecurity.claimingAge}
@@ -257,23 +247,21 @@ export function Screen2SavingsIncome() {
                                 <strong>At age {income.socialSecurity.claimingAge}:</strong> ${estimatedMonthlyBenefit.toFixed(0)}/mo (${(estimatedMonthlyBenefit * 12).toLocaleString()}/yr)
                             </InlineGuidance>
                         </div>
-                        <div>
-                            <label className="flex items-center gap-2 text-sm font-medium mb-1">
-                                SS Taxable Percentage
+                        <PercentField
+                            label="SS Taxable Percentage"
+                            help={
                                 <HelpPopover title="How Much of SS is Taxable?">
                                     <p>A <strong>cap</strong>, not a fixed rate. The tool applies the IRS provisional-income formula each year and taxes less (down to 0%) when income is low. 85% is the statutory max.</p>
                                 </HelpPopover>
-                            </label>
-                            <div className="relative">
-                                <input type="number" value={(income.socialSecurity.taxablePercentage * 100).toFixed(0)}
-                                    onChange={(e) => updateSocialSecurity({ taxablePercentage: parseFloat(e.target.value) / 100 || 0 })}
-                                    className="w-full pr-8 pl-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="5" min="0" max="85" />
-                                <span className="absolute right-3 top-2 text-gray-500">%</span>
-                            </div>
-                            <p className="text-xs text-gray-500 mt-1">
-                                {taxPct >= 85 ? 'Cap at the 85% max — actual share computed each year' : `Caps taxable SS at ${taxPct}%`}
-                            </p>
-                        </div>
+                            }
+                            value={income.socialSecurity.taxablePercentage}
+                            onChange={(taxablePercentage) => updateSocialSecurity({ taxablePercentage })}
+                            step={5}
+                            min={0}
+                            max={85}
+                            decimals={0}
+                            helperText={taxPct >= 85 ? 'Cap at the 85% max — actual share computed each year' : `Caps taxable SS at ${taxPct}%`}
+                        />
                     </div>
 
                     {hasEarningsTestIssue && (
@@ -295,15 +283,12 @@ export function Screen2SavingsIncome() {
                             <p className="text-sm text-gray-600">Added to yours before the IRS taxability formula. COLA and taxable-% above are shared.</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Monthly Benefit at FRA</label>
-                                <div className="relative">
-                                    <span className="absolute left-3 top-2 text-gray-500">$</span>
-                                    <input type="number" value={spouseSS.monthlyBenefitAtFRA}
-                                        onChange={(e) => updateSpouseSocialSecurity({ monthlyBenefitAtFRA: parseFloat(e.target.value) || 0 })}
-                                        className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" min="0" step="50" />
-                                </div>
-                            </div>
+                            <CurrencyField
+                                label="Monthly Benefit at FRA"
+                                value={spouseSS.monthlyBenefitAtFRA}
+                                onChange={(monthlyBenefitAtFRA) => updateSpouseSocialSecurity({ monthlyBenefitAtFRA })}
+                                step={50}
+                            />
                             <div>
                                 <label className="block text-sm font-medium mb-1">Claiming Age</label>
                                 <input type="number" value={spouseSS.claimingAge}
@@ -418,15 +403,12 @@ export function Screen2SavingsIncome() {
                                 </InlineGuidance>
                             )}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Annual Gross Income</label>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-2 text-gray-500">$</span>
-                                        <input type="number" value={income.partTimeWork.annualIncome}
-                                            onChange={(e) => updatePartTimeWork({ annualIncome: parseFloat(e.target.value) || 0 })}
-                                            className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="1000" min="0" />
-                                    </div>
-                                </div>
+                                <CurrencyField
+                                    label="Annual Gross Income"
+                                    value={income.partTimeWork.annualIncome}
+                                    onChange={(annualIncome) => updatePartTimeWork({ annualIncome })}
+                                    step={1000}
+                                />
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Start Age</label>
                                     <input type="number" value={income.partTimeWork.startAge}
@@ -465,15 +447,12 @@ export function Screen2SavingsIncome() {
                                     className="p-2 text-red-600 hover:bg-red-50 rounded-md" title="Remove rental income"><Trash2 className="w-5 h-5" /></button>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Annual Net Income</label>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-2 text-gray-500">$</span>
-                                        <input type="number" value={income.rentalIncome.annualNetIncome}
-                                            onChange={(e) => updateRentalIncome({ annualNetIncome: parseFloat(e.target.value) || 0 })}
-                                            className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="1000" min="0" />
-                                    </div>
-                                </div>
+                                <CurrencyField
+                                    label="Annual Net Income"
+                                    value={income.rentalIncome.annualNetIncome}
+                                    onChange={(annualNetIncome) => updateRentalIncome({ annualNetIncome })}
+                                    step={1000}
+                                />
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Start Age</label>
                                     <input type="number" value={income.rentalIncome.startAge}

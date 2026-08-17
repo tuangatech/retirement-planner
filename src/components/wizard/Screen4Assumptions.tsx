@@ -6,6 +6,7 @@
 import { useInputs } from '@/contexts/InputsContext';
 import { DEFAULT_VALUES } from '@/lib/constants';
 import { Info, MapPin, Check, Lock } from 'lucide-react';
+import { PercentField } from '@/components/common/PercentField';
 import { RetirementTimeline } from './RetirementTimeline';
 import { ScopeBadge } from '@/components/common/ScopeBadge';
 import { RMD_START_AGE } from '@/lib/calculations/rmd';
@@ -76,54 +77,51 @@ export function Screen4Assumptions() {
             <div className="border rounded-lg p-5 bg-gradient-to-r from-blue-50 to-white">
                 <h3 className="font-semibold text-lg mb-3">Tax &amp; Inflation</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            {stateComputed ? 'Federal Marginal Tax Rate' : 'Marginal Tax Rate'}
-                        </label>
-                        <div className="relative">
-                            <input type="number" value={(tax.combinedEffectiveRate * 100).toFixed(1)}
-                                onChange={(e) => updateTax({ combinedEffectiveRate: parseFloat(e.target.value) / 100 || 0 })}
-                                className="w-full pr-8 pl-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="1" min="0" max="50" />
-                            <span className="absolute right-3 top-2 text-gray-500">%</span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                            Applied <em>above</em> the standard deduction. Use a bracket rate, not a blended one — the tool models the deduction and SS formula for you.
-                            {stateComputed && <> Enter your <strong>federal</strong> rate only; {personal.state} tax is computed separately.</>}
-                        </p>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">General Inflation Rate</label>
-                        <div className="relative">
-                            <input type="number" value={(simulation.generalInflationRate * 100).toFixed(1)}
-                                onChange={(e) => updateSimulation({ generalInflationRate: parseFloat(e.target.value) / 100 || 0 })}
-                                className="w-full pr-8 pl-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="0.1" min="0" max="10" />
-                            <span className="absolute right-3 top-2 text-gray-500">%</span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">Default {(DEFAULT_VALUES.simulation.generalInflationRate * 100).toFixed(1)}% per year</p>
-                    </div>
+                    <PercentField
+                        label={stateComputed ? 'Federal Marginal Tax Rate' : 'Marginal Tax Rate'}
+                        value={tax.combinedEffectiveRate}
+                        onChange={(combinedEffectiveRate) => updateTax({ combinedEffectiveRate })}
+                        step={1}
+                        min={0}
+                        max={50}
+                        helperText={
+                            <>
+                                Applied <em>above</em> the standard deduction. Use a bracket rate, not a blended one — the tool models the deduction and SS formula for you.
+                                {stateComputed && <> Enter your <strong>federal</strong> rate only; {personal.state} tax is computed separately.</>}
+                            </>
+                        }
+                    />
+                    <PercentField
+                        label="General Inflation Rate"
+                        value={simulation.generalInflationRate}
+                        onChange={(generalInflationRate) => updateSimulation({ generalInflationRate })}
+                        step={0.1}
+                        min={0}
+                        max={10}
+                        helperText={`Default ${(DEFAULT_VALUES.simulation.generalInflationRate * 100).toFixed(1)}% per year`}
+                    />
 
                     {isAdvanced && (
                         <>
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Healthcare Inflation Rate</label>
-                                <div className="relative">
-                                    <input type="number" value={(simulation.healthcareInflationRate * 100).toFixed(1)}
-                                        onChange={(e) => updateSimulation({ healthcareInflationRate: parseFloat(e.target.value) / 100 || 0 })}
-                                        className="w-full pr-8 pl-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="0.1" min="0" max="15" />
-                                    <span className="absolute right-3 top-2 text-gray-500">%</span>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-1">Usually higher than general; default {(DEFAULT_VALUES.simulation.healthcareInflationRate * 100).toFixed(1)}%</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Investment Return Std. Deviation</label>
-                                <div className="relative">
-                                    <input type="number" value={(simulation.returnStdDeviation * 100).toFixed(0)}
-                                        onChange={(e) => updateSimulation({ returnStdDeviation: parseFloat(e.target.value) / 100 || 0 })}
-                                        className="w-full pr-8 pl-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" step="1" min="5" max="30" />
-                                    <span className="absolute right-3 top-2 text-gray-500">%</span>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-1">Market volatility; default {(DEFAULT_VALUES.simulation.returnStdDeviation * 100).toFixed(0)}%</p>
-                            </div>
+                            <PercentField
+                                label="Healthcare Inflation Rate"
+                                value={simulation.healthcareInflationRate}
+                                onChange={(healthcareInflationRate) => updateSimulation({ healthcareInflationRate })}
+                                step={0.1}
+                                min={0}
+                                max={15}
+                                helperText={`Usually higher than general; default ${(DEFAULT_VALUES.simulation.healthcareInflationRate * 100).toFixed(1)}%`}
+                            />
+                            <PercentField
+                                label="Investment Return Std. Deviation"
+                                value={simulation.returnStdDeviation}
+                                onChange={(returnStdDeviation) => updateSimulation({ returnStdDeviation })}
+                                step={1}
+                                min={5}
+                                max={30}
+                                decimals={0}
+                                helperText={`Market volatility; default ${(DEFAULT_VALUES.simulation.returnStdDeviation * 100).toFixed(0)}%`}
+                            />
                         </>
                     )}
                 </div>

@@ -10,6 +10,7 @@ import type { USState, RetirementPhase, OneTimeExpense } from '@/types';
 import { Trash2, AlertCircle } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { CollapsibleHelpPanel } from '@/components/common/CollapsibleHelpPanel';
+import { CurrencyField } from '@/components/common/CurrencyField';
 import { HelpPopover } from '@/components/common/HelpPopover';
 import { InlineGuidance } from '@/components/common/InlineGuidance';
 import { ScopeBadge } from '@/components/common/ScopeBadge';
@@ -83,11 +84,6 @@ export function Screen1Plan() {
             if (index === 1) newPhases[2] = { ...newPhases[2], startAge: value + 1 };
         }
         updatePhases(newPhases);
-    };
-
-    const handleSpendingChange = (index: number, raw: string) => {
-        const parsed = parseInt(raw) || 0;
-        handlePhaseChange(index, 'annualSpending', Math.max(MIN_PHASE_SPENDING, parsed));
     };
 
     const handleExpenseChange = (id: string, field: keyof OneTimeExpense, value: any) => {
@@ -330,17 +326,15 @@ export function Screen1Plan() {
                                         className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${isEndLocked[index] ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Annual Spending (Today’s $)</label>
-                                    <input
-                                        type="number"
-                                        value={phase.annualSpending}
-                                        onChange={(e) => handleSpendingChange(index, e.target.value)}
-                                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                        step="1000"
-                                        min={MIN_PHASE_SPENDING}
-                                    />
-                                </div>
+                                <CurrencyField
+                                    label="Annual Spending (Today’s $)"
+                                    value={phase.annualSpending}
+                                    onChange={(annualSpending) =>
+                                        handlePhaseChange(index, 'annualSpending', Math.max(MIN_PHASE_SPENDING, annualSpending))
+                                    }
+                                    step={1000}
+                                    min={MIN_PHASE_SPENDING}
+                                />
                             </div>
 
                             <InlineGuidance variant="example" className="mt-3">
