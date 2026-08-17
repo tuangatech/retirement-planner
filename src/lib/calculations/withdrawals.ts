@@ -430,43 +430,6 @@ export function handleSurplus(
     };
 }
 
-export function validateWithdrawalInputs(
-    currentAge: number,
-    balances: AccountBalances,
-    priorityOrder: Array<'taxable' | 'tax_deferred' | 'roth'>
-): { isValid: boolean; errors: string[] } {
-    const errors: string[] = [];
-
-    if (!Number.isFinite(currentAge) || currentAge < 0) {
-        errors.push('Invalid age');
-    }
-
-    if (balances.taxDeferred < 0 || balances.roth < 0 || balances.taxable < 0 || balances.hsa < 0) {
-        errors.push('Account balances cannot be negative');
-    }
-
-    if (priorityOrder.length !== 3) {
-        errors.push('Priority order must have exactly 3 accounts');
-    }
-
-    const uniqueAccounts = new Set(priorityOrder);
-    if (uniqueAccounts.size !== 3) {
-        errors.push('Priority order must have unique account types');
-    }
-
-    const validTypes = new Set(['taxable', 'tax_deferred', 'roth']);
-    for (const type of priorityOrder) {
-        if (!validTypes.has(type)) {
-            errors.push(`Invalid account type: ${type}`);
-        }
-    }
-
-    return {
-        isValid: errors.length === 0,
-        errors,
-    };
-}
-
 export function calculateTotalPortfolio(balances: AccountBalances): number {
     return balances.taxDeferred + balances.roth + balances.taxable + balances.hsa;
 }

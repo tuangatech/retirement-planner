@@ -5,10 +5,11 @@
 // docs/scenario-tax-comparisons.md for worked examples and src/lib/calculations/compareStatesTax.ts
 // for the calculation itself.
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Header } from '@/components/common/Header';
 import { Footer } from '@/components/common/Footer';
+import { CurrencyField } from '@/components/common/CurrencyField';
 import { compareStatesTax, type StateTaxComparisonInput } from '@/lib/calculations/compareStatesTax';
 import type { FilingStatus } from '@/lib/calculations/taxes';
 import { US_STATES } from '@/lib/constants';
@@ -28,41 +29,6 @@ function TaxFreeBadge() {
         <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-800">
             Tax-free
         </span>
-    );
-}
-
-function CurrencyField({
-    label,
-    value,
-    onChange,
-    help,
-    badge,
-}: {
-    label: string;
-    value: number;
-    onChange: (value: number) => void;
-    help?: string;
-    badge?: ReactNode;
-}) {
-    return (
-        <div>
-            <label className="flex items-center gap-2 text-sm font-medium mb-1">
-                {label}
-                {badge}
-            </label>
-            <div className="relative">
-                <span className="absolute left-3 top-2 text-gray-500">$</span>
-                <input
-                    type="number"
-                    value={value}
-                    onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-                    className="w-full pl-7 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                    step="500"
-                    min="0"
-                />
-            </div>
-            {help && <p className="text-xs text-gray-500 mt-1">{help}</p>}
-        </div>
     );
 }
 
@@ -193,21 +159,23 @@ export default function StateTaxComparisonPage() {
                     <h2 className="font-semibold text-lg pb-2 border-b-2 border-blue-200 text-blue-900">Income for the Year</h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <CurrencyField label="Social Security (household total)" value={socialSecurity} onChange={setSocialSecurity} />
-                        <CurrencyField label="401(k) / Traditional IRA Withdrawal" value={taxDeferredWithdrawal} onChange={setTaxDeferredWithdrawal} />
+                        <CurrencyField label="Social Security (household total)" value={socialSecurity} onChange={setSocialSecurity} step={500} />
+                        <CurrencyField label="401(k) / Traditional IRA Withdrawal" value={taxDeferredWithdrawal} onChange={setTaxDeferredWithdrawal} step={500} />
                         <CurrencyField
                             label="Roth IRA / 401(k) Distribution"
                             value={rothDistribution}
                             onChange={setRothDistribution}
-                            help="Always $0 taxable — shown only so your total income adds up"
-                            badge={<TaxFreeBadge />}
+                            step={500}
+                            helperText="Always $0 taxable — shown only so your total income adds up"
+                            help={<TaxFreeBadge />}
                         />
                         <div>
                             <CurrencyField
                                 label="HSA Withdrawal"
                                 value={hsaAmount}
                                 onChange={setHsaAmount}
-                                badge={hsaQualifiedMedical ? <TaxFreeBadge /> : undefined}
+                                step={500}
+                                help={hsaQualifiedMedical ? <TaxFreeBadge /> : undefined}
                             />
                             <label className="flex items-center gap-2 mt-1 text-xs text-gray-500">
                                 <input
@@ -228,13 +196,15 @@ export default function StateTaxComparisonPage() {
                             label="Part-Time Work Income"
                             value={partTimeWork}
                             onChange={setPartTimeWork}
-                            help="Wages, self-employment, or consulting income"
+                            step={500}
+                            helperText="Wages, self-employment, or consulting income"
                         />
                         <CurrencyField
                             label="Rental Income (net)"
                             value={rentalIncome}
                             onChange={setRentalIncome}
-                            help="Net rental income after expenses, royalties, or other passive income"
+                            step={500}
+                            helperText="Net rental income after expenses, royalties, or other passive income"
                         />
                     </div>
 
@@ -245,14 +215,16 @@ export default function StateTaxComparisonPage() {
                                 label="Taxable Investment Income"
                                 value={investmentGains}
                                 onChange={setInvestmentGains}
-                                help="Capital gains, dividends, and interest (e.g. from a HYSA or CD) — all taxed the same in this tool"
+                                step={500}
+                                helperText="Capital gains, dividends, and interest (e.g. from a HYSA or CD) — all taxed the same in this tool"
                             />
                             <CurrencyField
                                 label="Other Cash Withdrawn"
                                 value={nonTaxableCashWithdrawn}
                                 onChange={setNonTaxableCashWithdrawn}
-                                help="Money you're simply moving, not earning: brokerage cost basis, or principal from a bank, savings, HYSA, or CD. Doesn't affect your tax bill, but counts toward the total below"
-                                badge={<TaxFreeBadge />}
+                                step={500}
+                                helperText="Money you're simply moving, not earning: brokerage cost basis, or principal from a bank, savings, HYSA, or CD. Doesn't affect your tax bill, but counts toward the total below"
+                                help={<TaxFreeBadge />}
                             />
                         </div>
                     </div>
@@ -264,12 +236,14 @@ export default function StateTaxComparisonPage() {
                                 label="Government Pension Income"
                                 value={governmentPensionIncome}
                                 onChange={setGovernmentPensionIncome}
-                                help="NYS/local/federal/military pension — fully tax-exempt in NY"
+                                step={500}
+                                helperText="NYS/local/federal/military pension — fully tax-exempt in NY"
                             />
                             <CurrencyField
                                 label="Private Pension / Annuity Income"
                                 value={privatePensionIncome}
                                 onChange={setPrivatePensionIncome}
+                                step={500}
                             />
                         </div>
                     </div>

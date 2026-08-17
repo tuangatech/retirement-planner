@@ -11,6 +11,7 @@ import { Trash2, AlertCircle } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { CollapsibleHelpPanel } from '@/components/common/CollapsibleHelpPanel';
 import { CurrencyField } from '@/components/common/CurrencyField';
+import { NumberField } from '@/components/common/NumberField';
 import { HelpPopover } from '@/components/common/HelpPopover';
 import { InlineGuidance } from '@/components/common/InlineGuidance';
 import { ScopeBadge } from '@/components/common/ScopeBadge';
@@ -170,44 +171,32 @@ export function Screen1Plan() {
             {/* Timeline */}
             <div className="border rounded-lg p-5 space-y-4">
                 <div className={`grid grid-cols-1 md:grid-cols-2 ${isMFJ ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Retirement Age</label>
-                        <input
-                            type="number"
-                            value={retirementAge}
-                            onChange={(e) => updatePersonal({ retirementAge: parseInt(e.target.value) || 0 })}
-                            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                            min="40"
-                            max="75"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">When you stop working (40-75)</p>
-                    </div>
+                    <NumberField
+                        label="Retirement Age"
+                        value={retirementAge}
+                        onChange={(retirementAge) => updatePersonal({ retirementAge })}
+                        min={40}
+                        max={75}
+                        helperText="When you stop working (40-75)"
+                    />
                     {isMFJ && (
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Spouse’s Age at Retirement</label>
-                            <input
-                                type="number"
-                                value={personal.spouseAgeAtRetirement ?? DEFAULT_SPOUSE_AGE_AT_RETIREMENT}
-                                onChange={(e) => updatePersonal({ spouseAgeAtRetirement: parseInt(e.target.value) || 0 })}
-                                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                                min="40"
-                                max="90"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">Their age the year you retire</p>
-                        </div>
-                    )}
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Life Expectancy</label>
-                        <input
-                            type="number"
-                            value={lifeExpectancy}
-                            onChange={(e) => updatePersonal({ lifeExpectancy: parseInt(e.target.value) || 0 })}
-                            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                            min="70"
-                            max="110"
+                        <NumberField
+                            label="Spouse’s Age at Retirement"
+                            value={personal.spouseAgeAtRetirement ?? DEFAULT_SPOUSE_AGE_AT_RETIREMENT}
+                            onChange={(spouseAgeAtRetirement) => updatePersonal({ spouseAgeAtRetirement })}
+                            min={40}
+                            max={90}
+                            helperText="Their age the year you retire"
                         />
-                        <p className="text-xs text-gray-500 mt-1">How long money must last</p>
-                    </div>
+                    )}
+                    <NumberField
+                        label="Life Expectancy"
+                        value={lifeExpectancy}
+                        onChange={(lifeExpectancy) => updatePersonal({ lifeExpectancy })}
+                        min={70}
+                        max={110}
+                        helperText="How long money must last"
+                    />
                     <div>
                         <label className="block text-sm font-medium mb-1">State</label>
                         <select
@@ -305,27 +294,20 @@ export function Screen1Plan() {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">
-                                        Start Age <span className="ml-1 text-xs text-gray-500 font-normal">{startAgeLabels[index]}</span>
-                                    </label>
-                                    <input type="number" value={phase.startAge} disabled
-                                        className="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500 cursor-not-allowed" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">
-                                        End Age {isEndLocked[index] && <span className="ml-1 text-xs text-gray-500 font-normal">(set by life expectancy)</span>}
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={phase.endAge}
-                                        onChange={(e) => handlePhaseChange(index, 'endAge', parseInt(e.target.value) || 0)}
-                                        disabled={isEndLocked[index]}
-                                        min={endAgeMin[index]}
-                                        max={endAgeMax[index]}
-                                        className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${isEndLocked[index] ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
-                                    />
-                                </div>
+                                <NumberField
+                                    label={<>Start Age <span className="ml-1 text-xs text-gray-500 font-normal">{startAgeLabels[index]}</span></>}
+                                    value={phase.startAge}
+                                    onChange={() => {}}
+                                    disabled
+                                />
+                                <NumberField
+                                    label={<>End Age {isEndLocked[index] && <span className="ml-1 text-xs text-gray-500 font-normal">(set by life expectancy)</span>}</>}
+                                    value={phase.endAge}
+                                    onChange={(endAge) => handlePhaseChange(index, 'endAge', endAge)}
+                                    disabled={isEndLocked[index]}
+                                    min={endAgeMin[index]}
+                                    max={endAgeMax[index]}
+                                />
                                 <CurrencyField
                                     label="Annual Spending (Today’s $)"
                                     value={phase.annualSpending}

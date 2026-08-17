@@ -130,6 +130,16 @@ component), `Footer`, `Logo`, `ScenarioManager` (save dialog on Results), `Scope
 requirements). `components/ui/` holds shadcn/ui primitives (`button`, `card`, `tabs`,
 `tooltip`, `alert`, `input`, `label`) built on Radix.
 
+**Labeled input fields** (`components/common/`): `CurrencyField` ($-prefixed), `PercentField`
+(%-suffixed, stores the decimal fraction), `NumberField` (plain, e.g. ages/years) — the
+label + input + helper-text pattern repeated across every wizard screen and
+`StateTaxComparisonPage`. All three share the same prop shape (`label`, `help` for an inline
+node next to the label, `helperText` below the input, `step`/`min`/`max`) and the same
+`focus:ring-2 focus:ring-blue-500` styling, built on a plain `<input>` rather than
+`components/ui/input.tsx` (that primitive's neutral shadcn theme was never adopted — see the
+doc comment in `CurrencyField.tsx`). New numeric inputs should use one of these three rather
+than a raw `<input type="number">`.
+
 ---
 
 ## 4. State Management
@@ -386,6 +396,7 @@ src/
 ├── components/
 │   ├── common/        Header (3 variants) · Footer · Logo · ScenarioManager
 │   │                   ScopeBadge · HelpPopover · CollapsibleHelpPanel · InlineGuidance
+│   │                   CurrencyField · PercentField · NumberField
 │   ├── wizard/         Screen1Plan..Screen4Assumptions · WizardProgress
 │   │                   WizardNavigation · RetirementTimeline
 │   ├── results/        SummaryDashboard · AssumptionsPanel · CashFlowChart
@@ -397,7 +408,8 @@ src/
 ├── lib/
 │   ├── calculations/   random · rmd · socialSecurity · income · expenses · taxes
 │   │                   stateTax · stateTaxRules · hsa · withdrawals · yearlyProjection
-│   │                   compareStatesTax · index.ts (barrel) + co-located *.test.ts
+│   │                   compareStatesTax + co-located *.test.ts (no barrel — every
+│   │                   consumer imports the specific module it needs)
 │   ├── storage/        scenarioStorage.ts
 │   ├── constants.ts    DEFAULT_VALUES, US_STATES, RMD table, SS factors
 │   ├── analytics.ts    local-only event tracking (§11)
@@ -433,8 +445,14 @@ Internet Explorer. Required: `localStorage`, Web Workers, CSS Grid/Flexbox.
 
 ---
 
-**Document version:** 3.0 · **Last updated:** 2026-08-12 · **Status:** aligned with
+**Document version:** 3.1 · **Last updated:** 2026-08-17 · **Status:** aligned with
 Requirements v1.9 and the current codebase.
+
+**Changes from v3.0:** documented the three shared labeled-input components
+(`CurrencyField`, `PercentField`, `NumberField` — §3, §12) so new numeric fields reuse them
+instead of a raw `<input type="number">`. Removed `lib/calculations/index.ts` (§12): it was
+a barrel export nothing in the app imported through — every module already imports directly
+from its source file.
 
 **Changes from v2.1:** full rewrite. Replaced the 6-step wizard / "profiles" / HSA-era
 architecture with the shipped 4-screen wizard, "scenarios" storage model, state tax engine

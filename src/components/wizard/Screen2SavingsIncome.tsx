@@ -12,6 +12,7 @@ import type { Pension } from '@/types';
 import { CollapsibleHelpPanel } from '@/components/common/CollapsibleHelpPanel';
 import { CurrencyField } from '@/components/common/CurrencyField';
 import { PercentField } from '@/components/common/PercentField';
+import { NumberField } from '@/components/common/NumberField';
 import { HelpPopover } from '@/components/common/HelpPopover';
 import { InlineGuidance } from '@/components/common/InlineGuidance';
 import { ScopeBadge } from '@/components/common/ScopeBadge';
@@ -239,10 +240,13 @@ export function Screen2SavingsIncome() {
                             helperText={`Default ${(DEFAULT_VALUES.income.socialSecurity.colaRate * 100).toFixed(1)}%`}
                         />
                         <div>
-                            <label className="block text-sm font-medium mb-1">Claiming Age</label>
-                            <input type="number" value={income.socialSecurity.claimingAge}
-                                onChange={(e) => updateSocialSecurity({ claimingAge: parseInt(e.target.value) || 67 })}
-                                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" min="62" max="70" />
+                            <NumberField
+                                label="Claiming Age"
+                                value={income.socialSecurity.claimingAge}
+                                onChange={(claimingAge) => updateSocialSecurity({ claimingAge: claimingAge || 67 })}
+                                min={62}
+                                max={70}
+                            />
                             <InlineGuidance variant="example" className="mt-2">
                                 <strong>At age {income.socialSecurity.claimingAge}:</strong> ${estimatedMonthlyBenefit.toFixed(0)}/mo (${(estimatedMonthlyBenefit * 12).toLocaleString()}/yr)
                             </InlineGuidance>
@@ -289,12 +293,13 @@ export function Screen2SavingsIncome() {
                                 onChange={(monthlyBenefitAtFRA) => updateSpouseSocialSecurity({ monthlyBenefitAtFRA })}
                                 step={50}
                             />
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Claiming Age</label>
-                                <input type="number" value={spouseSS.claimingAge}
-                                    onChange={(e) => updateSpouseSocialSecurity({ claimingAge: parseInt(e.target.value) || 67 })}
-                                    className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" min="62" max="70" />
-                            </div>
+                            <NumberField
+                                label="Claiming Age"
+                                value={spouseSS.claimingAge}
+                                onChange={(claimingAge) => updateSpouseSocialSecurity({ claimingAge: claimingAge || 67 })}
+                                min={62}
+                                max={70}
+                            />
                         </div>
                     </div>
                 )}
@@ -409,18 +414,16 @@ export function Screen2SavingsIncome() {
                                     onChange={(annualIncome) => updatePartTimeWork({ annualIncome })}
                                     step={1000}
                                 />
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Start Age</label>
-                                    <input type="number" value={income.partTimeWork.startAge}
-                                        onChange={(e) => updatePartTimeWork({ startAge: parseInt(e.target.value) || 0 })}
-                                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">End Age</label>
-                                    <input type="number" value={income.partTimeWork.endAge}
-                                        onChange={(e) => updatePartTimeWork({ endAge: parseInt(e.target.value) || 0 })}
-                                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
-                                </div>
+                                <NumberField
+                                    label="Start Age"
+                                    value={income.partTimeWork.startAge}
+                                    onChange={(startAge) => updatePartTimeWork({ startAge })}
+                                />
+                                <NumberField
+                                    label="End Age"
+                                    value={income.partTimeWork.endAge}
+                                    onChange={(endAge) => updatePartTimeWork({ endAge })}
+                                />
                             </div>
                         </div>
                     ) : (
@@ -453,12 +456,11 @@ export function Screen2SavingsIncome() {
                                     onChange={(annualNetIncome) => updateRentalIncome({ annualNetIncome })}
                                     step={1000}
                                 />
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Start Age</label>
-                                    <input type="number" value={income.rentalIncome.startAge}
-                                        onChange={(e) => updateRentalIncome({ startAge: parseInt(e.target.value) || 0 })}
-                                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
-                                </div>
+                                <NumberField
+                                    label="Start Age"
+                                    value={income.rentalIncome.startAge}
+                                    onChange={(startAge) => updateRentalIncome({ startAge })}
+                                />
                                 <div>
                                     <label className="block text-sm font-medium mb-1">End Age</label>
                                     <input type="number" value={income.rentalIncome.endAge ?? ''}
