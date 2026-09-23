@@ -361,3 +361,54 @@ export function calculateTotalTaxes(
         total: onFixedIncome + onWithdrawals + payrollTax,
     };
 }
+
+/**
+ * Taxable income after the standard-deduction floor — the figure federal brackets
+ * apply to. Used to size a "fill this bracket" Roth conversion.
+ */
+export function calculateOrdinaryTaxableIncome(
+    income: {
+        socialSecurity: number;
+        pensions: number;
+        partTimeWork: number;
+        rentalIncome: number;
+    },
+    withdrawals: {
+        taxDeferred: number;
+        roth: number;
+        taxable: number;
+    },
+    socialSecurityTaxablePercentage: number,
+    costBasisPercentage: number,
+    currentAge: number,
+    year: number,
+    deductionInflationFactor: number = 1,
+    hsaNonMedicalWithdrawal: number = 0,
+    filingStatus: FilingStatus = 'single',
+    includeSeniorBonus: boolean = true,
+    spouseAge?: number
+): number {
+    const brokerageGain = withdrawals.taxable * (1 - costBasisPercentage);
+    const ordinaryWithdrawals = withdrawals.taxDeferred + hsaNonMedicalWithdrawal;
+    const otherAGIexclSS =
+        income.pensions + income.partTimeWork + income.rentalIncome +
+        ordinaryWithdrawals + brokerageGain;
+    const taxableSS = calculateTaxableSocialSecurity(
+        income.socialSecurity,
+        otherAGIexclSS,
+        filingStatus,
+        socialSecurityTaxablePercentage
+    );
+    const taxableBase =
+        taxableSS + income.pensions + income.partTimeWork + income.rentalIncome +
+        ordinaryWithdrawals + brokerageGain;
+    const deduction = calculateStandardDeduction(
+        currentAge,
+        year,
+        filingStatus,
+        deductionInflationFactor,
+        includeSeniorBonus,
+        spouseAge
+    );
+    return Math.max(0, taxableBase - deduction);
+}
