@@ -58,6 +58,7 @@ function proj(
             onWithdrawals: overrides.onWithdrawals ?? 0,
             payrollTax: 0,
             stateTax: 0,
+            onRothConversion: 0,
             total: 0,
         },
         portfolio: {
@@ -66,6 +67,7 @@ function proj(
             rmdAmount: overrides.rmdAmount ?? 0,
             rmdExcess: 0,
             hsaForHealthcare: 0,
+            rothConversion: 0,
             investmentReturns: { taxDeferred: 0, roth: 0, taxable: 0, hsa: 0, total: 0 },
             balances: {
                 taxDeferred: 0,

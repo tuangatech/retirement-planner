@@ -1,6 +1,7 @@
 // src/lib/storage/scenarioStorage.ts
 
 import type { SimulationResults, UserInputs } from '@/types';
+import { DEFAULT_ROTH_CONVERSION } from '@/lib/constants';
 
 export interface SavedScenario {
     id: string;
@@ -229,6 +230,13 @@ export class ScenarioStorage {
             // New scenarios get 'modeled' from DEFAULT_VALUES.
             if (scenario.inputs.tax && !scenario.inputs.tax.stateTaxMode) {
                 scenario.inputs.tax.stateTaxMode = 'manual';
+            }
+
+            // Backward compat: scenarios saved before Roth conversions have no
+            // `rothConversion`. Default them to disabled so an old plan does not start
+            // converting just because the feature shipped.
+            if (!scenario.inputs.rothConversion) {
+                scenario.inputs.rothConversion = { ...DEFAULT_ROTH_CONVERSION };
             }
 
             return scenario;

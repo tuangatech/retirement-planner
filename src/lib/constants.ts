@@ -1,6 +1,6 @@
 // src/lib/constants.ts
 
-import type { SocialSecurity, USState, UserInputs } from '@/types';
+import type { RothConversionStrategy, SocialSecurity, USState, UserInputs } from '@/types';
 
 /**
  * Seed values for a spouse's Social Security, applied when the user first switches
@@ -17,6 +17,22 @@ export const DEFAULT_SPOUSE_SOCIAL_SECURITY: SocialSecurity = {
 /** Spouse's age the year the primary retires, seeded when the user first switches to
  *  married-filing-jointly. A sensible, editable baseline (spouse a couple years younger). */
 export const DEFAULT_SPOUSE_AGE_AT_RETIREMENT = 56;
+
+/**
+ * Seed values for a Roth conversion plan. Disabled by default so new scenarios
+ * match the pre-feature engine. Ages cover a typical gap-year window (retire →
+ * just before Social Security / RMDs). Bracket-fill to 12% is the conservative
+ * default and matches the app's default federal marginal rate.
+ */
+export const DEFAULT_ROTH_CONVERSION: RothConversionStrategy = {
+    enabled: false,
+    startAge: 58,
+    endAge: 70,
+    strategyType: 'bracket_fill',
+    fixedAmount: 20000,
+    targetTaxBracket: 0.12,
+    payTaxFromAccount: 'taxable_cash',
+};
 
 export const US_STATES: { value: USState; label: string }[] = [
     { value: 'AL', label: 'Alabama' },
@@ -112,6 +128,7 @@ export const DEFAULT_VALUES: UserInputs = {
         // floor with tax-deferred draws in the gap years, then follows priorityOrder.
         strategy: 'tax_smart',
     },
+    rothConversion: DEFAULT_ROTH_CONVERSION,
     income: {
         socialSecurity: {
             monthlyBenefitAtFRA: 2400,

@@ -50,6 +50,9 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
     const isMFJ = inputs.personal.filingStatus === 'married_joint';
     const spouseAgeAtRetirement = inputs.personal.spouseAgeAtRetirement;
 
+    const showRothConversion = inputs.rothConversion?.enabled === true
+        || projections.some(p => p.portfolio.rothConversion > 0.5 || p.taxes.onRothConversion > 0.5);
+
     // Contiguous phase groups for the merged Phase column: startIndex → number of rows
     // to span. Each phase renders as one tinted band with a single centered label.
     const phaseGroupSpan = useMemo(() => {
@@ -74,9 +77,10 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
             // Expenses breakdown
             'Living Expenses', 'Healthcare Premiums', 'Healthcare Out-of-Pocket', 'One-Time Expenses', 'Total Expenses',
             // Taxes breakdown
-            'Income Tax', 'Payroll Tax', 'Withdrawal Tax', 'State Tax', 'Total Tax',
+            'Income Tax', 'Payroll Tax', 'Withdrawal Tax', 'State Tax', 'Roth Conversion Tax', 'Total Tax',
             // Withdrawals by account
             'Tax-Deferred Withdrawal', 'Roth Withdrawal', 'Taxable Withdrawal', 'HSA Withdrawal', 'Total Withdrawals',
+            'Roth Conversion',
             // HSA details
             'HSA Healthcare Coverage (Tax-Free)', 'HSA Balance',
             // All account balances
@@ -107,6 +111,7 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
             p.taxes.payrollTax.toFixed(0),
             p.taxes.onWithdrawals.toFixed(0),
             p.taxes.stateTax.toFixed(0),
+            p.taxes.onRothConversion.toFixed(0),
             p.taxes.total.toFixed(0),
             // Withdrawals
             p.portfolio.withdrawals.taxDeferred.toFixed(0),
@@ -114,6 +119,7 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
             p.portfolio.withdrawals.taxable.toFixed(0),
             p.portfolio.withdrawals.hsa.toFixed(0),
             p.portfolio.withdrawals.total.toFixed(0),
+            p.portfolio.rothConversion.toFixed(0),
             // HSA
             p.portfolio.hsaForHealthcare.toFixed(0),
             p.portfolio.balances.hsa.toFixed(0),
@@ -182,11 +188,10 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
                     </div>
                 </div>
 
-                {/* 8 columns for easy scanning */}
                 <TooltipProvider delayDuration={100}>
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[640px] text-sm table-fixed">
-                        {/* Thin phase spine + Age; the 5 money columns share the rest equally */}
+                    <table className={`w-full text-sm table-fixed ${showRothConversion ? 'min-w-[880px]' : 'min-w-[640px]'}`}>
+                        {/* Thin phase spine + Age; money columns share the rest equally */}
                         <colgroup>
                             <col className="w-[5px]" />
                             <col className="w-[13%]" />
@@ -194,6 +199,12 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
                             <col />
                             <col />
                             <col />
+                            {showRothConversion && (
+                                <>
+                                    <col />
+                                    <col />
+                                </>
+                            )}
                             <col />
                         </colgroup>
                         <thead className="bg-gray-50 border-b-2 border-gray-200">
@@ -217,6 +228,34 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
                                 <th className="px-4 py-3 text-right font-semibold">Expenses</th>
                                 <th className="px-4 py-3 text-right font-semibold">Taxes</th>
                                 <th className="px-4 py-3 text-right font-semibold">Withdrawals</th>
+                                {showRothConversion && (
+                                    <>
+                                        <th className="px-4 py-3 text-right font-semibold">
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span className="cursor-help underline decoration-dotted decoration-gray-400/60 underline-offset-4">
+                                                        Roth Conversion
+                                                    </span>
+                                                </TooltipTrigger>
+                                                <TooltipContent className="max-w-[16rem]">
+                                                    Tax-deferred amount moved to Roth this year. Not a spending withdrawal.
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </th>
+                                        <th className="px-4 py-3 text-right font-semibold">
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span className="cursor-help underline decoration-dotted decoration-gray-400/60 underline-offset-4">
+                                                        Conversion Tax
+                                                    </span>
+                                                </TooltipTrigger>
+                                                <TooltipContent className="max-w-[16rem]">
+                                                    Extra federal and state tax caused only by this year&apos;s Roth conversion. Already included in Taxes.
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </th>
+                                    </>
+                                )}
                                 <th className="px-4 py-3 text-right font-semibold">Portfolio</th>
                             </tr>
                         </thead>
@@ -350,6 +389,7 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
                                                 { label: 'Withdrawal tax', value: p.taxes.onWithdrawals },
                                                 { label: 'Payroll tax', value: p.taxes.payrollTax },
                                                 { label: 'State tax', value: p.taxes.stateTax },
+                                                { label: 'Roth conversion tax', value: p.taxes.onRothConversion },
                                             ]}
                                         />
 
@@ -374,7 +414,18 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
                                             ]}
                                         />
 
-                                        {/* Portfolio Balance — show a clean $0 once depleted (sub-dollar
+                                        {showRothConversion && (
+                                            <>
+                                                <td className={`px-4 py-3 text-right tabular-nums font-medium ${p.portfolio.rothConversion > 0.5 ? 'text-emerald-700' : 'text-gray-400'}`}>
+                                                    {formatMoney(p.portfolio.rothConversion)}
+                                                </td>
+                                                <td className={`px-4 py-3 text-right tabular-nums font-medium ${p.taxes.onRothConversion > 0.5 ? 'text-orange-700' : 'text-gray-400'}`}>
+                                                    {formatMoney(p.taxes.onRothConversion)}
+                                                </td>
+                                            </>
+                                        )}
+
+                                        {/* Portfolio Balance — show a clean $0 once depleted (sub-dollar)
                                             residuals otherwise round up to a misleading "$1"). */}
                                         <BreakdownCell
                                             value={p.portfolioDepleted ? 0 : p.portfolio.balances.total}
@@ -416,11 +467,21 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
                         <span className="font-semibold">Expenses:</span> Total spending (living costs, healthcare, one-time expenses)
                     </div>
                     <div>
-                        <span className="font-semibold">Taxes:</span> All taxes paid (income tax, payroll tax, withdrawal tax)
+                        <span className="font-semibold">Taxes:</span> All taxes paid (income tax, payroll tax, withdrawal tax, plus any Roth conversion tax)
                     </div>
                     <div>
                         <span className="font-semibold">Withdrawals:</span> Total from all accounts (tax-deferred, Roth, taxable, HSA)
                     </div>
+                    {showRothConversion && (
+                        <>
+                            <div>
+                                <span className="font-semibold">Roth Conversion:</span> Tax-deferred dollars moved to Roth this year — not a spending withdrawal
+                            </div>
+                            <div>
+                                <span className="font-semibold">Conversion Tax:</span> Incremental tax caused only by that conversion (already counted in Taxes)
+                            </div>
+                        </>
+                    )}
                     <div>
                         <span className="font-semibold">Portfolio:</span> Combined balance of all investment accounts
                     </div>
@@ -429,7 +490,7 @@ export default function AnnualTable({ results, inputs }: AnnualTableProps) {
                 <div className="mt-3 pt-3 border-t border-blue-300 text-xs text-blue-700">
                     <strong>💡 Tip:</strong> Hover any Income, Expenses, Taxes, Withdrawals, or Portfolio
                     figure to see the items that make it up. Export to CSV for the full account-by-account
-                    breakdown including HSA balance, healthcare coverage, RMDs, and more.
+                    breakdown including HSA balance, healthcare coverage, RMDs, Roth conversions, and more.
                 </div>
             </div>
 

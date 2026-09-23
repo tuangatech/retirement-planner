@@ -346,7 +346,7 @@ describe('state tax', () => {
         for (const p of r.projections) {
             expect(p.taxes.stateTax).toBe(0);
             expect(p.taxes.total).toBeCloseTo(
-                p.taxes.onFixedIncome + p.taxes.onWithdrawals + p.taxes.payrollTax + p.taxes.stateTax,
+                p.taxes.onFixedIncome + p.taxes.onWithdrawals + p.taxes.payrollTax + p.taxes.stateTax + p.taxes.onRothConversion,
                 6
             );
         }
@@ -397,7 +397,7 @@ describe('state tax', () => {
 
         for (const p of r.projections) {
             expect(p.taxes.total).toBeCloseTo(
-                p.taxes.onFixedIncome + p.taxes.onWithdrawals + p.taxes.payrollTax + p.taxes.stateTax,
+                p.taxes.onFixedIncome + p.taxes.onWithdrawals + p.taxes.payrollTax + p.taxes.stateTax + p.taxes.onRothConversion,
                 6
             );
         }
@@ -442,7 +442,7 @@ describe('state tax', () => {
 
         for (const p of r.projections) {
             expect(p.taxes.total).toBeCloseTo(
-                p.taxes.onFixedIncome + p.taxes.onWithdrawals + p.taxes.payrollTax + p.taxes.stateTax,
+                p.taxes.onFixedIncome + p.taxes.onWithdrawals + p.taxes.payrollTax + p.taxes.stateTax + p.taxes.onRothConversion,
                 6
             );
         }
@@ -471,7 +471,7 @@ describe('state tax', () => {
 
         for (const p of r.projections) {
             expect(p.taxes.total).toBeCloseTo(
-                p.taxes.onFixedIncome + p.taxes.onWithdrawals + p.taxes.payrollTax + p.taxes.stateTax,
+                p.taxes.onFixedIncome + p.taxes.onWithdrawals + p.taxes.payrollTax + p.taxes.stateTax + p.taxes.onRothConversion,
                 6
             );
         }
@@ -489,7 +489,7 @@ describe('state tax', () => {
 
         for (const p of r.projections) {
             expect(p.taxes.total).toBeCloseTo(
-                p.taxes.onFixedIncome + p.taxes.onWithdrawals + p.taxes.payrollTax + p.taxes.stateTax,
+                p.taxes.onFixedIncome + p.taxes.onWithdrawals + p.taxes.payrollTax + p.taxes.stateTax + p.taxes.onRothConversion,
                 6
             );
         }
@@ -526,7 +526,87 @@ describe('state tax', () => {
         const r = runCompleteSimulation(inputs, createSeededRNG(3));
         for (const p of r.projections) {
             const lhs = p.income.totalBeforeWithdrawals + p.portfolio.withdrawals.total;
-            const rhs = p.expenses.total + p.taxes.total + p.netCashFlow;
+            // Conversion tax is paid from account balances, not the spending cash flow.
+            const rhs = p.expenses.total + (p.taxes.total - p.taxes.onRothConversion) + p.netCashFlow;
+            expect(lhs).toBeCloseTo(rhs, 4);
+        }
+    });
+});
+
+describe('runCompleteSimulation — Roth conversions', () => {
+    function conversionPlan(): UserInputs {
+        const inputs = makeInputs();
+        inputs.personal.retirementAge = 60;
+        inputs.personal.lifeExpectancy = 63;
+        inputs.phases = [
+            { name: 'go_go', startAge: 60, endAge: 63, annualSpending: 5_000 },
+            { name: 'slow_go', startAge: 64, endAge: 64, annualSpending: 5_000 },
+            { name: 'no_go', startAge: 65, endAge: 65, annualSpending: 5_000 },
+        ];
+        inputs.accounts.taxDeferred.balanceAtRetirement = 200_000;
+        inputs.accounts.roth.balanceAtRetirement = 50_000;
+        inputs.accounts.taxable.balanceAtRetirement = 80_000;
+        inputs.accounts.hsa.balanceAtRetirement = 0;
+        inputs.income.socialSecurity.monthlyBenefitAtFRA = 0;
+        inputs.simulation.returnStdDeviation = 0;
+        inputs.simulation.generalInflationRate = 0;
+        inputs.withdrawalStrategy.strategy = 'standard';
+        inputs.rothConversion = {
+            enabled: true,
+            startAge: 60,
+            endAge: 61,
+            strategyType: 'fixed_amount',
+            fixedAmount: 20_000,
+            targetTaxBracket: 0.12,
+            payTaxFromAccount: 'taxable_cash',
+        };
+        return inputs;
+    }
+
+    it('converts the fixed amount only inside the age window', () => {
+        const r = runCompleteSimulation(conversionPlan(), createSeededRNG(1));
+        const byAge = Object.fromEntries(r.projections.map(p => [p.age, p]));
+        expect(byAge[60].portfolio.rothConversion).toBeCloseTo(20_000, 0);
+        expect(byAge[61].portfolio.rothConversion).toBeCloseTo(20_000, 0);
+        expect(byAge[62].portfolio.rothConversion).toBe(0);
+        expect(byAge[63].portfolio.rothConversion).toBe(0);
+    });
+
+    it('moves traditional → Roth and records conversion tax', () => {
+        const r = runCompleteSimulation(conversionPlan(), createSeededRNG(1));
+        const year60 = r.projections[0];
+        expect(year60.taxes.onRothConversion).toBeGreaterThan(0);
+        expect(year60.portfolio.balances.taxDeferred).toBeLessThan(200_000);
+        expect(year60.portfolio.balances.roth).toBeGreaterThan(50_000);
+    });
+
+    it('withholding from proceeds deposits less into Roth than paying from taxable', () => {
+        const cash = conversionPlan();
+        const withhold = conversionPlan();
+        withhold.rothConversion!.payTaxFromAccount = 'conversion_proceeds';
+
+        const cashRun = runCompleteSimulation(cash, createSeededRNG(1));
+        const withholdRun = runCompleteSimulation(withhold, createSeededRNG(1));
+
+        expect(withholdRun.projections[0].portfolio.balances.roth)
+            .toBeLessThan(cashRun.projections[0].portfolio.balances.roth);
+        expect(withholdRun.projections[0].portfolio.balances.taxable)
+            .toBeGreaterThan(cashRun.projections[0].portfolio.balances.taxable);
+    });
+
+    it('does nothing when the plan is disabled', () => {
+        const inputs = conversionPlan();
+        inputs.rothConversion!.enabled = false;
+        const r = runCompleteSimulation(inputs, createSeededRNG(1));
+        expect(r.projections.every(p => p.portfolio.rothConversion === 0)).toBe(true);
+        expect(r.projections.every(p => p.taxes.onRothConversion === 0)).toBe(true);
+    });
+
+    it('keeps the cash-flow identity when conversions run', () => {
+        const r = runCompleteSimulation(conversionPlan(), createSeededRNG(1));
+        for (const p of r.projections) {
+            const lhs = p.income.totalBeforeWithdrawals + p.portfolio.withdrawals.total;
+            const rhs = p.expenses.total + (p.taxes.total - p.taxes.onRothConversion) + p.netCashFlow;
             expect(lhs).toBeCloseTo(rhs, 4);
         }
     });

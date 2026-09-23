@@ -16,8 +16,9 @@ import type {
     SimulationSettings,
     PreMedicareCosts,
     MedicareCosts,
+    RothConversionStrategy,
 } from '@/types';
-import { DEFAULT_VALUES, DEFAULT_SPOUSE_SOCIAL_SECURITY } from '@/lib/constants';
+import { DEFAULT_VALUES, DEFAULT_SPOUSE_SOCIAL_SECURITY, DEFAULT_ROTH_CONVERSION } from '@/lib/constants';
 
 interface InputsContextType {
     inputs: UserInputs;
@@ -41,6 +42,7 @@ interface InputsContextType {
     updateHealthcare: (type: 'preMedicare' | 'medicare', data: Partial<PreMedicareCosts & MedicareCosts>) => void;
     updateTax: (data: Partial<TaxSettings>) => void;
     updateWithdrawalStrategy: (data: Partial<UserInputs['withdrawalStrategy']>) => void;
+    updateRothConversion: (data: Partial<RothConversionStrategy>) => void;
     updateSimulation: (data: Partial<SimulationSettings>) => void;
     setMode: (mode: 'basic' | 'advanced') => void;
     resetToDefaults: () => void;
@@ -219,6 +221,16 @@ export function InputsProvider({ children }: { children: ReactNode }) {
         }));
     }, []);
 
+    const updateRothConversion = useCallback((data: Partial<RothConversionStrategy>) => {
+        setInputs((prev: UserInputs) => ({
+            ...prev,
+            rothConversion: {
+                ...(prev.rothConversion ?? DEFAULT_ROTH_CONVERSION),
+                ...data,
+            },
+        }));
+    }, []);
+
     const updateSimulation = useCallback((data: Partial<SimulationSettings>) => {
         setInputs((prev: UserInputs) => ({
             ...prev,
@@ -266,6 +278,7 @@ export function InputsProvider({ children }: { children: ReactNode }) {
                 updateHealthcare,
                 updateTax,
                 updateWithdrawalStrategy,
+                updateRothConversion,
                 updateSimulation,
                 setMode,
                 resetToDefaults,

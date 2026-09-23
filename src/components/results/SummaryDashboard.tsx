@@ -5,6 +5,7 @@ import type { SimulationResults } from '@/types'
 import type { UserInputs } from '@/types';
 import { formatMoney } from '@/lib/format';
 import { RMD_START_AGE } from '@/lib/calculations/rmd';
+import { RothConversionImpact } from './RothConversionImpact';
 
 interface SummaryDashboardProps {
     results: SimulationResults;
@@ -267,6 +268,10 @@ export function SummaryDashboard({ results, inputs }: SummaryDashboardProps) {
                     color="orange"
                 />
             </div>
+
+            {inputs.rothConversion?.enabled && (
+                <RothConversionImpact inputs={inputs} />
+            )}
         </div>
     );
 }

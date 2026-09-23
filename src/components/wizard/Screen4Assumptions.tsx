@@ -5,7 +5,8 @@
 
 import { useInputs } from '@/contexts/InputsContext';
 import { DEFAULT_VALUES } from '@/lib/constants';
-import { Info, MapPin, Check, Lock } from 'lucide-react';
+import { Info, MapPin, Check } from 'lucide-react';
+import { RothConversionSettings } from './RothConversionSettings';
 import { PercentField } from '@/components/common/PercentField';
 import { RetirementTimeline } from './RetirementTimeline';
 import { ScopeBadge } from '@/components/common/ScopeBadge';
@@ -22,8 +23,6 @@ interface StrategyCard {
     does: string;
     real: string;
     bestFor: string;
-    disabled?: boolean;
-    disabledNote?: string;
 }
 
 const STRATEGIES: StrategyCard[] = [
@@ -50,13 +49,11 @@ const STRATEGIES: StrategyCard[] = [
         does: 'Tax-smart sequencing plus converting extra tax-deferred → Roth up to a ceiling you set, during low-income gap years.',
         real: 'Actively convert Traditional → Roth each gap year to fill a low bracket, paying tax from taxable. Mind the ACA subsidy cliff before 65 and the 2-year-lagged IRMAA surcharge.',
         bestFor: 'Larger tax-deferred balances; users comfortable with IRMAA/ACA trade-offs.',
-        disabled: true,
-        disabledNote: 'Coming soon',
     },
 ];
 
 export function Screen4Assumptions() {
-    const { inputs, updateTax, updateSimulation, updateWithdrawalStrategy } = useInputs();
+    const { inputs, updateTax, updateSimulation, updateWithdrawalStrategy, updateRothConversion } = useInputs();
     const { tax, simulation, mode, personal, income } = inputs;
     const isAdvanced = mode === 'advanced';
     const stateModeled = isStateModeled(personal.state);
@@ -64,7 +61,10 @@ export function Screen4Assumptions() {
     // A missing mode is a legacy scenario: it keeps computing with state folded into the rate.
     const stateComputed = stateModeled && (tax.stateTaxMode ?? 'manual') === 'modeled';
     const isMFJ = personal.filingStatus === 'married_joint';
-    const selected: StrategyKey = inputs.withdrawalStrategy.strategy ?? 'tax_smart';
+    const conversionsOn = inputs.rothConversion?.enabled === true;
+    const selected: StrategyKey = conversionsOn
+        ? 'roth_conversion'
+        : (inputs.withdrawalStrategy.strategy === 'roth_conversion' ? 'tax_smart' : (inputs.withdrawalStrategy.strategy ?? 'tax_smart'));
 
     return (
         <div className="space-y-6">
@@ -184,27 +184,31 @@ export function Screen4Assumptions() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
                     {STRATEGIES.map((s) => {
-                        const isSelected = selected === s.key && !s.disabled;
+                        const isSelected = selected === s.key;
                         return (
                             <button
                                 key={s.key}
                                 type="button"
-                                disabled={s.disabled}
-                                onClick={() => !s.disabled && updateWithdrawalStrategy({ strategy: s.key })}
+                                onClick={() => {
+                                    if (s.key === 'roth_conversion') {
+                                        updateWithdrawalStrategy({ strategy: 'roth_conversion' });
+                                        updateRothConversion({ enabled: true });
+                                    } else {
+                                        updateWithdrawalStrategy({ strategy: s.key });
+                                        updateRothConversion({ enabled: false });
+                                    }
+                                }}
                                 className={[
-                                    'flex h-full flex-col text-left border rounded-lg p-4 transition-colors',
-                                    s.disabled ? 'opacity-60 cursor-not-allowed bg-gray-50' : 'cursor-pointer hover:border-blue-400',
+                                    'flex h-full flex-col text-left border rounded-lg p-4 transition-colors cursor-pointer hover:border-blue-400',
                                     isSelected ? 'border-blue-600 ring-2 ring-blue-200 bg-blue-50' : 'border-gray-300',
                                 ].join(' ')}
                             >
                                 <div className="flex items-center justify-between mb-2 min-h-[1.5rem]">
                                     <span className={['text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded',
-                                        s.key === 'tax_smart' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-700'].join(' ')}>
+                                        s.key === 'tax_smart' ? 'bg-green-100 text-green-800' : s.key === 'roth_conversion' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700'].join(' ')}>
                                         {s.tier}
                                     </span>
-                                    {s.disabled ? (
-                                        <span className="flex items-center gap-1 text-xs text-gray-500"><Lock className="w-3.5 h-3.5" />{s.disabledNote}</span>
-                                    ) : isSelected ? (
+                                    {isSelected ? (
                                         <span className="flex items-center gap-1 text-sm font-medium text-blue-700"><Check className="w-4 h-4" />Selected</span>
                                     ) : null}
                                 </div>
@@ -219,6 +223,10 @@ export function Screen4Assumptions() {
                     })}
                 </div>
 
+                <div className="mt-4">
+                    <RothConversionSettings />
+                </div>
+
                 <div className="border rounded-lg p-5 bg-gradient-to-r from-blue-50 to-white mt-4">
                     <h4 className="font-semibold text-lg mb-1">Your retirement timeline</h4>
                     <p className="text-sm text-gray-600 mb-3">
@@ -229,7 +237,7 @@ export function Screen4Assumptions() {
                         lifeExpectancy={personal.lifeExpectancy}
                         ssClaimingAge={income.socialSecurity.claimingAge}
                         rmdAge={RMD_START_AGE}
-                        showIrmaa={isAdvanced}
+                        showIrmaa={isAdvanced || conversionsOn}
                     />
                 </div>
 
