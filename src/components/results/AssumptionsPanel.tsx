@@ -3,6 +3,7 @@
 import { Link } from 'react-router-dom';
 import { AlertTriangle, Info } from 'lucide-react';
 import type { UserInputs } from '@/types';
+import { formatMoney } from '@/lib/format';
 import { RMD_START_AGE } from '@/lib/calculations/rmd';
 import { stateTaxDisclosure } from '@/lib/calculations/stateTax';
 
@@ -195,6 +196,18 @@ export default function AssumptionsPanel({ inputs }: AssumptionsPanelProps) {
                                 </strong>
                                 {' '}— assumes you follow this order in real life
                             </li>
+                            {inputs.rothConversion?.enabled && (
+                                <li>
+                                    Roth conversions:{' '}
+                                    <strong>
+                                        ages {inputs.rothConversion.startAge}–{inputs.rothConversion.endAge},{' '}
+                                        {inputs.rothConversion.strategyType === 'fixed_amount'
+                                            ? `${formatMoney(inputs.rothConversion.fixedAmount ?? 0)}/year`
+                                            : `fill the ${((inputs.rothConversion.targetTaxBracket ?? 0.12) * 100).toFixed(0)}% bracket`}
+                                        , tax paid from {inputs.rothConversion.payTaxFromAccount === 'taxable_cash' ? 'taxable cash' : 'conversion proceeds'}
+                                    </strong>
+                                </li>
+                            )}
                         </ul>
                     </AssumptionSection>
 

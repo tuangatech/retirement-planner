@@ -3,7 +3,9 @@
 import type { UserInputs } from '@/types';
 import { determinePhase, calculateYearlyExpenses } from '@/lib/calculations/expenses';
 import { calculateYearlyIncome } from '@/lib/calculations/income';
-import { calculateTotalTaxes, calculateTaxOnFixedIncome } from '@/lib/calculations/taxes';
+import { calculateTotalTaxes, calculateTaxOnFixedIncome, calculateOrdinaryTaxableIncome } from '@/lib/calculations/taxes';
+import { sizeRothConversion, applyRothConversionToBalances } from '@/lib/calculations/rothConversion';
+import { DEFAULT_ROTH_CONVERSION } from '@/lib/constants';
 import {
     executeWithdrawals,
     handleSurplus,
@@ -49,6 +51,8 @@ export interface YearlyProjection {
          * marginal rate is carrying the state burden instead (docs/5-state-tax-model.md).
          */
         stateTax: number;
+        /** Incremental federal + state tax caused by this year's Roth conversion. */
+        onRothConversion: number;
         total: number;
     };
 
@@ -64,6 +68,8 @@ export interface YearlyProjection {
         rmdAmount: number;
         rmdExcess: number;
         hsaForHealthcare: number;  // Tax-free healthcare coverage
+        /** Tax-deferred → Roth conversion this year (0 if the plan is off or out of window). */
+        rothConversion: number;
         investmentReturns: {
             taxDeferred: number;
             roth: number;
@@ -301,15 +307,96 @@ export function calculateYearlyProjection(
     );
 
     // State income tax on the year's full picture, now that withdrawals are known.
-    const stateTax = computeStateTax(stateRules, {
+    const brokerageGains =
+        withdrawalResult.withdrawals.taxable * (1 - (accounts.taxable.costBasisPercentage || 0.70));
+    const stateTaxWithoutConversion = computeStateTax(stateRules, {
         ...stateInputsBase,
         taxDeferredWithdrawals: withdrawalResult.withdrawals.taxDeferred,
-        brokerageGains:
-            withdrawalResult.withdrawals.taxable * (1 - (accounts.taxable.costBasisPercentage || 0.70)),
+        brokerageGains,
         hsaNonMedicalWithdrawals: hsaNonMedicalWithdrawal,
     }).tax;
 
-    const totalTax = finalTaxes.total + stateTax;
+    // STEP 6b: Roth conversion — after spending withdrawals (an RMD cannot be
+    // converted) and before investment returns. Tax on the conversion is paid from
+    // taxable cash or withheld from the converted amount; it is not a spending
+    // withdrawal, so netCashFlow excludes it (see identity below).
+    const rothPlan = inputs.rothConversion ?? DEFAULT_ROTH_CONVERSION;
+    const costBasis = accounts.taxable.costBasisPercentage || 0.70;
+    const taxableIncomeBeforeConversion = calculateOrdinaryTaxableIncome(
+        {
+            socialSecurity: incomeResult.socialSecurity,
+            pensions: incomeResult.pensions,
+            partTimeWork: incomeResult.partTimeWork,
+            rentalIncome: incomeResult.rentalIncome,
+        },
+        withdrawalResult.withdrawals,
+        income.socialSecurity.taxablePercentage,
+        costBasis,
+        currentAge,
+        year,
+        deductionInflationFactor,
+        hsaNonMedicalWithdrawal,
+        filingStatus,
+        true,
+        spouseAge
+    );
+    const conversionAmount = sizeRothConversion(
+        rothPlan,
+        currentAge,
+        updatedBalances.taxDeferred,
+        taxableIncomeBeforeConversion,
+        filingStatus,
+        deductionInflationFactor
+    );
+
+    let conversionTax = 0;
+    const stateTax = stateTaxWithoutConversion;
+    const totalTaxWithoutConversion = finalTaxes.total + stateTaxWithoutConversion;
+
+    if (conversionAmount > 0) {
+        const withdrawalsWithConversion = {
+            ...withdrawalResult.withdrawals,
+            taxDeferred: withdrawalResult.withdrawals.taxDeferred + conversionAmount,
+        };
+        const taxesWithConversion = calculateTotalTaxes(
+            {
+                socialSecurity: incomeResult.socialSecurity,
+                pensions: incomeResult.pensions,
+                partTimeWork: incomeResult.partTimeWork,
+                rentalIncome: incomeResult.rentalIncome,
+            },
+            withdrawalsWithConversion,
+            tax.combinedEffectiveRate,
+            income.socialSecurity.taxablePercentage,
+            costBasis,
+            incomeResult.partTimePayrollTax,
+            currentAge,
+            year,
+            deductionInflationFactor,
+            hsaNonMedicalWithdrawal,
+            filingStatus,
+            true,
+            spouseAge
+        );
+        const stateTaxWithConversion = computeStateTax(stateRules, {
+            ...stateInputsBase,
+            taxDeferredWithdrawals: withdrawalsWithConversion.taxDeferred,
+            brokerageGains,
+            hsaNonMedicalWithdrawals: hsaNonMedicalWithdrawal,
+        }).tax;
+
+        conversionTax =
+            (taxesWithConversion.total - finalTaxes.total) +
+            (stateTaxWithConversion - stateTaxWithoutConversion);
+        updatedBalances = applyRothConversionToBalances(
+            updatedBalances,
+            conversionAmount,
+            conversionTax,
+            rothPlan.payTaxFromAccount
+        );
+    }
+
+    const totalTax = totalTaxWithoutConversion + conversionTax;
 
     // Total withdrawals and net cash flow — computed here (before returns) so any
     // surplus can be reinvested and then compounded this year.
@@ -319,11 +406,13 @@ export function calculateYearlyProjection(
         withdrawalResult.withdrawals.taxable +
         withdrawalResult.withdrawals.hsa;
 
+    // Conversion tax is paid from account balances (taxable cash or conversion
+    // proceeds), not from this year's spending cash flow.
     const netCashFlow =
         incomeResult.totalBeforeWithdrawals +
         totalWithdrawals -
         expensesResult.total -
-        totalTax;
+        totalTaxWithoutConversion;
 
     // Reinvest surplus from the withdrawal branch into the taxable account. This
     // covers both forced-RMD excess and the small over-withdrawal that arises
@@ -404,6 +493,7 @@ export function calculateYearlyProjection(
             onWithdrawals: finalTaxes.onWithdrawals,
             payrollTax: finalTaxes.payrollTax,
             stateTax,
+            onRothConversion: conversionTax,
             total: totalTax,
         },
 
@@ -419,6 +509,7 @@ export function calculateYearlyProjection(
             rmdAmount: withdrawalResult.rmdAmount,
             rmdExcess: withdrawalResult.rmdExcess,
             hsaForHealthcare: withdrawalResult.hsaForHealthcare,
+            rothConversion: conversionAmount,
             investmentReturns,
             balances: {
                 taxDeferred: updatedBalances.taxDeferred,

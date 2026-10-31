@@ -154,7 +154,23 @@ export function generateInsights(projections: YearlyProjection[], inputs: UserIn
         }
     }
 
-    // 8. Portfolio Growth Detection (first 5 years)
+    // 8. Roth conversions in the window
+    if (inputs.rothConversion?.enabled) {
+        const converted = projections.filter(p => p.portfolio.rothConversion > 0.5);
+        if (converted.length > 0) {
+            const totalConverted = converted.reduce((s, p) => s + p.portfolio.rothConversion, 0);
+            const totalTax = converted.reduce((s, p) => s + p.taxes.onRothConversion, 0);
+            insights.push({
+                type: 'info',
+                icon: 'trending-up',
+                title: 'Roth conversions in the gap years',
+                ageRange: `Ages ${converted[0].age}–${converted[converted.length - 1].age}`,
+                description: `The plan converts approximately ${(totalConverted / 1000).toFixed(0)}K from tax-deferred to Roth and pays about ${(totalTax / 1000).toFixed(0)}K of conversion tax. That shrinks later RMDs and moves growth into a tax-free account.`,
+            });
+        }
+    }
+
+    // 9. Portfolio Growth Detection (first 5 years)
     if (projections.length >= 5) {
         const startPortfolio = projections[0].portfolio.balances.total;
         const year5Portfolio = projections[4].portfolio.balances.total;

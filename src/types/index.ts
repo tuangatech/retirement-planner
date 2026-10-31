@@ -127,6 +127,30 @@ export interface SimulationSettings {
     returnStdDeviation: number;
 }
 
+/**
+ * Gap-year Roth conversion plan. Optional so scenarios saved before this feature
+ * stay valid — missing values load as disabled (see scenarioStorage). When enabled,
+ * the engine converts tax-deferred → Roth each year in [startAge, endAge].
+ */
+export interface RothConversionStrategy {
+    enabled: boolean;
+    /** First age (inclusive) to convert. Typically retirement / start of the gap years. */
+    startAge: number;
+    /** Last age (inclusive) to convert. Typically before Social Security and RMDs. */
+    endAge: number;
+    strategyType: 'fixed_amount' | 'bracket_fill';
+    /** Annual conversion amount if strategyType is 'fixed_amount'. */
+    fixedAmount?: number;
+    /** Ordinary-income bracket to fill to if strategyType is 'bracket_fill' (e.g. 0.12, 0.22, 0.24). */
+    targetTaxBracket?: number;
+    /**
+     * Where the conversion tax is paid:
+     * - 'taxable_cash' — pay from the taxable/brokerage account (preferred; preserves Roth principal).
+     * - 'conversion_proceeds' — withhold from the converted amount (smaller Roth balance).
+     */
+    payTaxFromAccount: 'taxable_cash' | 'conversion_proceeds';
+}
+
 export interface UserInputs {
     personal: PersonalInfo;
     phases: [RetirementPhase, RetirementPhase, RetirementPhase];
@@ -146,17 +170,22 @@ export interface UserInputs {
          * - 'standard'        — spend strictly by priorityOrder (the conventional rule of thumb).
          * - 'tax_smart'       — each gap year, draw tax-deferred up to the standard-deduction
          *                       floor (≈ tax-free), then fall through to priorityOrder. Default.
-         * - 'roth_conversion' — tax-smart PLUS Roth conversions in the gap years (Advanced;
-         *                       not yet implemented — shown as "coming soon" in the wizard).
+         * - 'roth_conversion' — tax-smart sequencing; the conversion itself is driven by
+         *                       `rothConversion` (enabled + ages + amount/bracket).
          * Optional so pre-existing saved scenarios (which lack it) stay valid; the engine and
          * the storage loader default a missing value to keep old plans faithful to how they
          * were computed.
          */
         strategy?: 'standard' | 'tax_smart' | 'roth_conversion';
 
-        /** Advanced tier only: taxable-income ceiling to convert up to. Unused until Roth conversions ship. */
+        /** @deprecated Use `rothConversion.targetTaxBracket` / `fixedAmount`. Kept so older saved scenarios still type-check. */
         conversionCeiling?: number;
     };
+    /**
+     * Optional so pre-existing saved scenarios stay valid. Missing values load as
+     * disabled — an old plan must not start converting just because the feature shipped.
+     */
+    rothConversion?: RothConversionStrategy;
     income: {
         socialSecurity: SocialSecurity;
         // MFJ only: the spouse's own Social Security. Summed with the primary's
