@@ -7,23 +7,101 @@ interface ResultsComparisonProps {
     scenarioB: SavedScenario;
 }
 
+// Hoisted to module scope: a component defined inside another component is a new type
+// on every render, so React would remount every row each time. None of these use props.
+const formatCurrency = (amount: number) => {
+    return amount.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
+    });
+};
+
+const formatPercent = (value: number) => {
+    const percentValue = value > 1 ? value : value * 100;
+    return `${percentValue.toFixed(1)}%`;
+};
+
+const getComparisonIcon = (delta: number, threshold: number = 0) => {
+    if (Math.abs(delta) < threshold) {
+        return <Minus className="w-4 h-4 text-gray-400" />;
+    }
+    return delta > 0 ? (
+        <TrendingUp className="w-4 h-4 text-green-600" />
+    ) : (
+        <TrendingDown className="w-4 h-4 text-blue-600" />
+    );
+};
+
+const getComparisonColor = (delta: number, threshold: number = 0) => {
+    if (Math.abs(delta) < threshold) return 'text-gray-600';
+    return delta > 0 ? 'text-green-600' : 'text-blue-600';
+};
+
+const formatDelta = (delta: number, isPercent: boolean = false) => {
+    const formatted = isPercent
+        ? formatPercent(Math.abs(delta))
+        : formatCurrency(Math.abs(delta));
+    const prefix = delta > 0 ? '+' : delta < 0 ? '-' : '';
+    return `${prefix}${formatted}`;
+};
+
+// Reusable row component
+const ComparisonRow = ({
+    label,
+    description,
+    valueA,
+    valueB,
+    delta,
+    threshold,
+    isPercent = false,
+}: {
+    label: string;
+    description: string;
+    valueA: string;
+    valueB: string;
+    delta: number;
+    threshold: number;
+    isPercent?: boolean;
+}) => (
+    <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex items-start justify-between gap-4">
+            {/* Left: label + icon */}
+            <div className="flex items-start gap-3 min-w-0">
+                <div className="mt-0.5 flex-shrink-0">
+                    {getComparisonIcon(delta, threshold)}
+                </div>
+                <div>
+                    <p className="font-medium text-gray-900">{label}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+                </div>
+            </div>
+
+            {/* Right: A / B / Difference values */}
+            <div className="flex items-center gap-6 flex-shrink-0 text-right">
+                <div>
+                    <p className="text-xs text-gray-500 mb-0.5">Scenario A</p>
+                    <p className="font-semibold text-gray-900">{valueA}</p>
+                </div>
+                <div className="min-w-[75px]">
+                    <p className="text-xs text-gray-500 mb-0.5">Scenario B</p>
+                    <p className="font-semibold text-gray-900">{valueB}</p>
+                </div>
+                <div className="min-w-[88px]">
+                    <p className="text-xs text-gray-500 mb-0.5">Difference</p>
+                    <p className={`font-semibold ${getComparisonColor(delta, threshold)}`}>
+                        {formatDelta(delta, isPercent)}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 export const ResultsComparison: React.FC<ResultsComparisonProps> = ({
     scenarioA,
     scenarioB,
 }) => {
-    const formatCurrency = (amount: number) => {
-        return amount.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            maximumFractionDigits: 0,
-        });
-    };
-
-    const formatPercent = (value: number) => {
-        const percentValue = value > 1 ? value : value * 100;
-        return `${percentValue.toFixed(1)}%`;
-    };
-
     // Check if both scenarios have results
     const hasResults = scenarioA.results && scenarioB.results;
 
@@ -49,82 +127,6 @@ export const ResultsComparison: React.FC<ResultsComparisonProps> = ({
     const medianFinalDelta = resultsA.percentiles.p50 - resultsB.percentiles.p50;
     const p25FinalDelta = resultsA.percentiles.p25 - resultsB.percentiles.p25;
     const p75FinalDelta = resultsA.percentiles.p75 - resultsB.percentiles.p75;
-
-    const getComparisonIcon = (delta: number, threshold: number = 0) => {
-        if (Math.abs(delta) < threshold) {
-            return <Minus className="w-4 h-4 text-gray-400" />;
-        }
-        return delta > 0 ? (
-            <TrendingUp className="w-4 h-4 text-green-600" />
-        ) : (
-            <TrendingDown className="w-4 h-4 text-blue-600" />
-        );
-    };
-
-    const getComparisonColor = (delta: number, threshold: number = 0) => {
-        if (Math.abs(delta) < threshold) return 'text-gray-600';
-        return delta > 0 ? 'text-green-600' : 'text-blue-600';
-    };
-
-    const formatDelta = (delta: number, isPercent: boolean = false) => {
-        const formatted = isPercent
-            ? formatPercent(Math.abs(delta))
-            : formatCurrency(Math.abs(delta));
-        const prefix = delta > 0 ? '+' : delta < 0 ? '-' : '';
-        return `${prefix}${formatted}`;
-    };
-
-    // Reusable row component
-    const ComparisonRow = ({
-        label,
-        description,
-        valueA,
-        valueB,
-        delta,
-        threshold,
-        isPercent = false,
-    }: {
-        label: string;
-        description: string;
-        valueA: string;
-        valueB: string;
-        delta: number;
-        threshold: number;
-        isPercent?: boolean;
-    }) => (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="flex items-start justify-between gap-4">
-                {/* Left: label + icon */}
-                <div className="flex items-start gap-3 min-w-0">
-                    <div className="mt-0.5 flex-shrink-0">
-                        {getComparisonIcon(delta, threshold)}
-                    </div>
-                    <div>
-                        <p className="font-medium text-gray-900">{label}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{description}</p>
-                    </div>
-                </div>
-
-                {/* Right: A / B / Difference values */}
-                <div className="flex items-center gap-6 flex-shrink-0 text-right">
-                    <div>
-                        <p className="text-xs text-gray-500 mb-0.5">Scenario A</p>
-                        <p className="font-semibold text-gray-900">{valueA}</p>
-                    </div>
-                    <div className="min-w-[75px]">
-                        <p className="text-xs text-gray-500 mb-0.5">Scenario B</p>
-                        <p className="font-semibold text-gray-900">{valueB}</p>
-                    </div>
-                    <div className="min-w-[88px]">
-                        <p className="text-xs text-gray-500 mb-0.5">Difference</p>
-                        <p className={`font-semibold ${getComparisonColor(delta, threshold)}`}>
-                            {formatDelta(delta, isPercent)}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
 
     return (
         <div className="bg-gradient-to-r from-blue-50 via-white to-purple-50 rounded-lg p-6 border-2 border-gray-200 shadow-md">
