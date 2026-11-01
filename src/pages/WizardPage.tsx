@@ -39,7 +39,7 @@ export default function WizardPage() {
     const [showDisclosures, setShowDisclosures] = useState(false);
 
     // Track step changes for analytics
-    const [stepStartTime, setStepStartTime] = useState<number>(Date.now());
+    const [stepStartTime, setStepStartTime] = useState<number>(() => Date.now());
 
     // Sync currentStep when URL is changed externally (e.g., reset from Header)
     useEffect(() => {

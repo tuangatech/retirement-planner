@@ -29,6 +29,10 @@ export default function ScenariosPage() {
 
     const compareScenarioId = searchParams.get('compare');
 
+    const refreshScenarios = () => {
+        setScenarios(getAllScenarios());
+    };
+
     useEffect(() => {
         refreshScenarios();
     }, []);
@@ -60,10 +64,6 @@ export default function ScenariosPage() {
             }
         }
     }, [compareScenarioId, scenarios, setSearchParams]);
-
-    const refreshScenarios = () => {
-        setScenarios(getAllScenarios());
-    };
 
     const handleDelete = (id: string) => {
         const scenario = scenarios.find(s => s.id === id);

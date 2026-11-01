@@ -21,6 +21,23 @@ interface MonteCarloChartProps {
     inputs: UserInputs;
 }
 
+// Module scope, not inside the chart: a component defined during render is remounted
+// on every render. It only needs formatMoney, so nothing is lost by hoisting.
+const CustomTooltip = ({ active, payload }: any) => {
+    if (!active || !payload || payload.length === 0) return null;
+
+    return (
+        <div className="bg-white border-2 border-gray-300 rounded-lg p-3 shadow-lg">
+            <p className="font-semibold mb-2">Age {payload[0].payload.age}</p>
+            {payload.map((entry: any) => (
+                <p key={entry.dataKey} style={{ color: entry.color }} className="text-sm">
+                    {entry.name}: {formatMoney(entry.value)}
+                </p>
+            ))}
+        </div>
+    );
+};
+
 export default function MonteCarloChart({ results, inputs }: MonteCarloChartProps) {
     const successRate = results.successRate * 100;
 
@@ -49,21 +66,6 @@ export default function MonteCarloChart({ results, inputs }: MonteCarloChartProp
         return Math.ceil((base * 1.6) / 500_000) * 500_000;
     }, [chartData]);
     const p90ExceedsCap = yDomainMax > 0 && chartData.some(d => d.p90 > yDomainMax);
-
-    const CustomTooltip = ({ active, payload }: any) => {
-        if (!active || !payload || payload.length === 0) return null;
-
-        return (
-            <div className="bg-white border-2 border-gray-300 rounded-lg p-3 shadow-lg">
-                <p className="font-semibold mb-2">Age {payload[0].payload.age}</p>
-                {payload.map((entry: any) => (
-                    <p key={entry.dataKey} style={{ color: entry.color }} className="text-sm">
-                        {entry.name}: {formatMoney(entry.value)}
-                    </p>
-                ))}
-            </div>
-        );
-    };
 
     return (
         <div className="space-y-4">
